@@ -209,7 +209,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ExportSampleImagesViewExtension_ViewExtensionDefinition.xml" />
+    <Content Include="manifest\ExportSampleImagesViewExtension_ViewExtensionDefinition.xml" />
     <Content Include="images\logo.png" />
     <Content Include="license.txt" />
     <Content Include="Windows Logo.png" />
