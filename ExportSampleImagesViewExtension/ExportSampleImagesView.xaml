@@ -38,9 +38,9 @@
                     VerticalAlignment="Top" 
                     VerticalContentAlignment="Top" 
                     Foreground="{StaticResource PrimaryCharcoal100Brush}" 
-                    FontSize="12"></Label>
+                    FontSize="10"></Label>
                 <Border Grid.Column="1" BorderBrush="{x:Null}">
-                    <TextBlock Text="{Binding SourcePath}" TextWrapping="Wrap" VerticalAlignment="Top" Padding="5"></TextBlock>
+                    <TextBlock Text="{Binding SourcePath}" TextWrapping="Wrap" VerticalAlignment="Top" Padding="5" FontSize="10"></TextBlock>
                 </Border>
                 <Button Content="..." Grid.Column="2"
                         Command="{Binding SourceFolderCommand}"
@@ -65,9 +65,9 @@
                     VerticalAlignment="Top" 
                     VerticalContentAlignment="Top" 
                     Foreground="{StaticResource PrimaryCharcoal100Brush}" 
-                    FontSize="12"></Label>
+                    FontSize="10"></Label>
                 <Border Grid.Column="1" BorderBrush="{x:Null}">
-                    <TextBlock Text="{Binding TargetPath}" TextWrapping="Wrap" VerticalAlignment="Top" Padding="5"></TextBlock>
+                    <TextBlock Text="{Binding TargetPath}" TextWrapping="Wrap" VerticalAlignment="Top" Padding="5" FontSize="10"></TextBlock>
                 </Border>
                 <Button Content="..." Grid.Column="2"
                         Command="{Binding TargetFolderCommand}"
@@ -80,18 +80,32 @@
                         Width="50"
                         Style="{StaticResource SolidButtonStyleSmaller}"/>
             </Grid> 
+            <Separator Margin="-20 10"></Separator>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="File Name: " FontSize="10" 
+                       Foreground="{StaticResource PrimaryCharcoal100Brush}" />
+                <TextBlock Text="{Binding FileName}" FontSize="10" Padding="5"></TextBlock>
+            </StackPanel>
         </StackPanel>
 
         <DockPanel HorizontalAlignment="Stretch" Grid.Row="1">
-               <Button Content="Run"
-                       Command="{Binding ExportGraphsCommand}"
-                       HorizontalAlignment="Right"
-                       DockPanel.Dock="Right"
-                       Background="White"
-                       BorderBrush="#BFBFBF"
-                       Foreground="#3C3C3C"
-                       Width="120"
-                       Style="{StaticResource CtaButtonStyle}"/>
-           </DockPanel> 
+            <Button Content="Save Image"
+                    Command="{Binding ExportGraphsCommand}"
+                    DockPanel.Dock="Right"
+                    HorizontalAlignment="Right"
+                    Background="White"
+                    BorderBrush="#BFBFBF"
+                    Foreground="#3C3C3C"
+                    Style="{StaticResource SolidButtonStyleSmaller}"/>
+            <Button Content="Open"
+                    Margin="5 0"
+                    Command="{Binding OpenGraphsCommand}"
+                    DockPanel.Dock="Right"
+                    HorizontalAlignment="Right"
+                    Background="White"
+                    BorderBrush="#BFBFBF"
+                    Foreground="#3C3C3C"
+                    Style="{StaticResource SolidButtonStyleSmaller}"/>
+        </DockPanel> 
     </Grid>
 </UserControl>

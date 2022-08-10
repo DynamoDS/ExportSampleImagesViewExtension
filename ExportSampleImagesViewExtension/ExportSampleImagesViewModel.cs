@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
@@ -25,7 +26,7 @@ namespace ExportSampleImagesViewExtension
 
         //private readonly Window dynamoWindow;
         internal DynamoViewModel DynamoViewModel;
-        internal WorkspaceModel CurrentWorkspace;
+        internal HomeWorkspaceModel CurrentWorkspace;
 
         private readonly ViewModelCommandExecutive ViewModelExecutive;
         private readonly ICommandExecutive CommandExecutive;
@@ -33,6 +34,7 @@ namespace ExportSampleImagesViewExtension
 
         private string sourcePath;
         private string targetPath;
+        private string fileName;
 
         public string SourcePath
         {
@@ -60,9 +62,23 @@ namespace ExportSampleImagesViewExtension
             }
         }
 
+        public string FileName
+        {
+            get { return fileName; }
+            set
+            {
+                if (value != fileName)
+                {
+                    fileName = value;
+                    RaisePropertyChanged(nameof(FileName));
+                }
+            }
+        }
+
         public DelegateCommand SourceFolderCommand { get; set; }
         public DelegateCommand TargetFolderCommand { get; set; }
         public DelegateCommand ExportGraphsCommand { get; set; }
+        public DelegateCommand OpenGraphsCommand { get; set; }
 
         #endregion
 
@@ -75,12 +91,16 @@ namespace ExportSampleImagesViewExtension
             if (p == null) return;
 
             this.viewLoadedParamsInstance = p;
-            this.viewLoadedParamsInstance.CurrentWorkspaceOpened += OnCurrentWorkspaceOpened;
+
+            p.CurrentWorkspaceChanged += OnCurrentWorkspaceChanged;
+            p.CurrentWorkspaceCleared += OnCurrentWorkspaceCleared;
 
             if (this.viewLoadedParamsInstance.CurrentWorkspaceModel is HomeWorkspaceModel)
             {
                 this.CurrentWorkspace = this.viewLoadedParamsInstance.CurrentWorkspaceModel as HomeWorkspaceModel;
                 this.DynamoViewModel = this.viewLoadedParamsInstance.DynamoWindow.DataContext as DynamoViewModel;
+
+                this.CurrentWorkspace.EvaluationCompleted += CurrentWorkspaceOnEvaluationCompleted;
 
                 this.ViewModelExecutive = p.ViewModelCommandExecutive;
                 this.CommandExecutive = p.CommandExecutive;
@@ -90,17 +110,40 @@ namespace ExportSampleImagesViewExtension
             SourceFolderCommand = new DelegateCommand(SetSourceFolder);
             TargetFolderCommand = new DelegateCommand(SetTargetFolder);
             ExportGraphsCommand = new DelegateCommand(ExportGraphs);
+            OpenGraphsCommand = new DelegateCommand(OpenGraphs);
         }
 
+        private void OnCurrentWorkspaceCleared(IWorkspaceModel workspace)
+        {
+            CurrentWorkspace = this.viewLoadedParamsInstance.CurrentWorkspaceModel as HomeWorkspaceModel;
+
+        }
+
+        private void OnCurrentWorkspaceChanged(IWorkspaceModel workspace)
+        {
+            CurrentWorkspace.EvaluationCompleted -= CurrentWorkspaceOnEvaluationCompleted;
+
+            CurrentWorkspace = workspace as HomeWorkspaceModel;
+            CurrentWorkspace.EvaluationCompleted += CurrentWorkspaceOnEvaluationCompleted;
+        }
+
+        private void CurrentWorkspaceOnEvaluationCompleted(object sender, EvaluationCompletedEventArgs e)
+        {
+            FileName += " Rendered!";
+        }
+        
         private void OnCurrentWorkspaceOpened(IWorkspaceModel workspace)
         {
             if (workspace as HomeWorkspaceModel == null) return;
 
             this.CurrentWorkspace = workspace as HomeWorkspaceModel;
             this.DynamoViewModel = this.viewLoadedParamsInstance.DynamoWindow.DataContext as DynamoViewModel;
+
+            if (this.DynamoViewModel == null) return;
+            this.DynamoViewModel.Model.WorkspaceOpened += WorkspaceOpened;
         }
 
-
+        #region Commands
         private void SetSourceFolder(object obj)
         {
             string folder = Utilities.Utilities.GetFolderDialog();
@@ -124,15 +167,11 @@ namespace ExportSampleImagesViewExtension
 
             TargetPath = folder;
         }
+        #endregion
 
-
-        /// <summary>
-        /// Export all the graphs we have found in the destination folder
-        /// </summary>
-        /// <param name="obj"></param>
-        private void ExportGraphs(object obj)
+        private void OpenGraphs(object obj)
         {
-            if (string.IsNullOrEmpty(SourcePath) || string.IsNullOrEmpty(TargetPath)) 
+            if (string.IsNullOrEmpty(SourcePath) || string.IsNullOrEmpty(TargetPath))
                 return;
 
             var files = Utilities.Utilities.GetAllFilesOfExtension(SourcePath);
@@ -143,36 +182,64 @@ namespace ExportSampleImagesViewExtension
             {
                 // 1 Open a graph
                 OpenDynamoGraph(file);
-                // 2 Prepare the graph for exporting 
-                CleanUpGraph();
-                // 3 Export an image
-                SaveGraphToImage(file);
             }
-        }
-
-        private void CleanUpGraph()
-        {
-            this.DynamoViewModel.Model.ForceRun();
-            this.ViewModelExecutive.FitViewCommand();
-        }
-
-        private void SaveGraphToImage(string fileName)
-        {
-            var path = Path.Combine(TargetPath, System.IO.Path.GetFileNameWithoutExtension(fileName) + ".png");
-            
-            this.DynamoViewModel.SaveImage(path); 
         }
 
         // TODO: Try catch? How to capture if the opening was successful?
         private void OpenDynamoGraph(string path)
         {
-            this.DynamoViewModel.OpenCommand.Execute(path);
+            DynamoViewModel.OpenCommand.Execute(path);
         }
 
+        /// <summary>
+        /// Export all the graphs we have found in the destination folder
+        /// </summary>
+        /// <param name="obj"></param>
+        private void ExportGraphs(object obj)
+        {
+            // 3 Export an image
+            SaveGraphToImage();
+        }
+        
+        private void SaveGraphToImage()
+        {
+            if (string.IsNullOrEmpty(TargetPath) || string.IsNullOrEmpty(FileName)) 
+                return;
 
+            var path = Path.Combine(TargetPath, FileName + ".png");
+            
+            this.DynamoViewModel.SaveImage(path); 
+        }
+
+        /// <summary>
+        /// Triggers when the graph view opens
+        /// </summary>
+        /// <param name="workspace"></param>
+        private void WorkspaceOpened(WorkspaceModel workspace)
+        {
+            FileName = Path.GetFileNameWithoutExtension(workspace.FileName);
+
+            var homespace = workspace as HomeWorkspaceModel;
+            homespace.
+
+            FileName += " Run completed?";
+
+            // 2 Prepare the graph for exporting 
+            //CleanUpGraph();
+
+            // 3 Export an image
+            //SaveGraphToImage();
+            //CloseGraph();
+        }
+
+        /// <summary>
+        /// Remove event handlers
+        /// </summary>
         public void Dispose()
         {
-            viewLoadedParamsInstance.CurrentWorkspaceChanged -= OnCurrentWorkspaceOpened;
+            viewLoadedParamsInstance.CurrentWorkspaceChanged -= OnCurrentWorkspaceOpened; 
+            this.CurrentWorkspace.EvaluationCompleted -= CurrentWorkspaceOnEvaluationCompleted;
+
         }
     }
 }
