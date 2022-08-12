@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Threading;
 using Dynamo.Controls;
 using Dynamo.Core;
 using Dynamo.Extensions;
@@ -100,8 +102,6 @@ namespace ExportSampleImagesViewExtension
                 this.CurrentWorkspace = this.viewLoadedParamsInstance.CurrentWorkspaceModel as HomeWorkspaceModel;
                 this.DynamoViewModel = this.viewLoadedParamsInstance.DynamoWindow.DataContext as DynamoViewModel;
 
-                this.CurrentWorkspace.EvaluationCompleted += CurrentWorkspaceOnEvaluationCompleted;
-
                 this.ViewModelExecutive = p.ViewModelCommandExecutive;
                 this.CommandExecutive = p.CommandExecutive;
                 this.ViewModelCommandExecutive = p.ViewModelCommandExecutive;
@@ -116,20 +116,30 @@ namespace ExportSampleImagesViewExtension
         private void OnCurrentWorkspaceCleared(IWorkspaceModel workspace)
         {
             CurrentWorkspace = this.viewLoadedParamsInstance.CurrentWorkspaceModel as HomeWorkspaceModel;
-
         }
 
         private void OnCurrentWorkspaceChanged(IWorkspaceModel workspace)
         {
-            CurrentWorkspace.EvaluationCompleted -= CurrentWorkspaceOnEvaluationCompleted;
-
             CurrentWorkspace = workspace as HomeWorkspaceModel;
+            
             CurrentWorkspace.EvaluationCompleted += CurrentWorkspaceOnEvaluationCompleted;
         }
 
+        /// <summary>
+        /// There is a race condition here I cannot currently solve
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void CurrentWorkspaceOnEvaluationCompleted(object sender, EvaluationCompletedEventArgs e)
         {
-            FileName += " Rendered!";
+            //FileName = Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName);
+
+            //DoEvents();
+
+            //var path = Path.Combine(TargetPath, "Test" + ".png");
+            //this.DynamoViewModel.SaveImageCommand.Execute(path);
+
+            CurrentWorkspace.EvaluationCompleted -= CurrentWorkspaceOnEvaluationCompleted;
         }
         
         private void OnCurrentWorkspaceOpened(IWorkspaceModel workspace)
@@ -182,13 +192,23 @@ namespace ExportSampleImagesViewExtension
             {
                 // 1 Open a graph
                 OpenDynamoGraph(file);
+
+                DoEvents(); // Allows visual tree to be reconstructed.
+
+                FileName = Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName);
+                var path = Path.Combine(TargetPath, FileName + ".png");
+                this.DynamoViewModel.SaveImageCommand.Execute(path);
             }
         }
 
         // TODO: Try catch? How to capture if the opening was successful?
         private void OpenDynamoGraph(string path)
         {
-            DynamoViewModel.OpenCommand.Execute(path);
+            try
+            {
+                this.DynamoViewModel.OpenCommand.Execute(path);
+            }
+            catch (Exception) { }
         }
 
         /// <summary>
@@ -208,7 +228,7 @@ namespace ExportSampleImagesViewExtension
 
             var path = Path.Combine(TargetPath, FileName + ".png");
             
-            this.DynamoViewModel.SaveImage(path); 
+            this.DynamoViewModel.SaveImageCommand.Execute(path); 
         }
 
         /// <summary>
@@ -237,9 +257,31 @@ namespace ExportSampleImagesViewExtension
         /// </summary>
         public void Dispose()
         {
-            viewLoadedParamsInstance.CurrentWorkspaceChanged -= OnCurrentWorkspaceOpened; 
-            this.CurrentWorkspace.EvaluationCompleted -= CurrentWorkspaceOnEvaluationCompleted;
+            viewLoadedParamsInstance.CurrentWorkspaceChanged -= OnCurrentWorkspaceOpened;
+        }
 
+
+        /// <summary>
+        ///     Force the Dispatcher to empty it's queue
+        /// </summary>
+        [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        public static void DoEvents()
+        {
+            var frame = new DispatcherFrame();
+            Dispatcher.CurrentDispatcher.Invoke(DispatcherPriority.Background,
+                new DispatcherOperationCallback(ExitFrame), frame);
+            Dispatcher.PushFrame(frame);
+        }
+
+        /// <summary>
+        ///     Helper method for DispatcherUtil
+        /// </summary>
+        /// <param name="frame"></param>
+        /// <returns></returns>
+        private static object ExitFrame(object frame)
+        {
+            ((DispatcherFrame)frame).Continue = false;
+            return null;
         }
     }
 }
