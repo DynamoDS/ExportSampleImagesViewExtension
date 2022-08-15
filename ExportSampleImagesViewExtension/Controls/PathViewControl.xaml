@@ -27,7 +27,8 @@
         </Grid.ColumnDefinitions>
 
         <!--the path text-->
-        <TextBlock x:Name="PathTextBlock" Style="{StaticResource DarkTextBlock}" 
+        <TextBlock x:Name="PathTextBlock" 
+                   Style="{StaticResource DarkTextBlock}" 
                    Text="{Binding FolderPath}"
                    Grid.Column="0"
                    Margin="0 4"
@@ -36,6 +37,18 @@
                    Padding="5,5,5,5"
                    ToolTip="{Binding FolderPath}"
                    Foreground="{StaticResource PreferencesWindowFontColor}"/>
+        <TextBlock x:Name="PlaceholderTextBlock" 
+                   Style="{StaticResource DarkTextBlock}" 
+                   Visibility="{Binding FolderPath, Converter={StaticResource NonEmptyStringToCollapsedConverter}}"
+                   Text="Select folder .."
+                   FontSize="10"
+                   Grid.Column="0"
+                   Margin="0 4"
+                   Background="{StaticResource PreferencesWindowItemDarkerBackgroundColor}"
+                   MinHeight="24"
+                   Padding="5,5,5,5"
+                   ToolTip="{Binding FolderPath}"
+                   Foreground="{StaticResource PreferencesWindowButtonMouseOverFontColor}"/>
    
         <!--the the edit path button-->
         <Button    Grid.Column="1"

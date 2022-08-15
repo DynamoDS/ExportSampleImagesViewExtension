@@ -16,11 +16,11 @@ using System.Windows.Shapes;
 namespace ExportSampleImagesViewExtension.Controls
 {
     /// <summary>
-    /// Interaction logic for FolderPathView.xaml
+    /// Interaction logic for GraphViewControl.xaml
     /// </summary>
-    public partial class FolderPathView : UserControl
+    public partial class GraphViewControl : UserControl
     {
-        public FolderPathView()
+        public GraphViewControl()
         {
             InitializeComponent();
         }

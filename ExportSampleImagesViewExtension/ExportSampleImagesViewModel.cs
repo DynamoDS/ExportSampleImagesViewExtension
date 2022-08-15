@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
@@ -22,6 +23,7 @@ using Dynamo.ViewModels;
 using Dynamo.Views;
 using Dynamo.Wpf.Extensions;
 using ExportSampleImagesViewExtension.Controls;
+using PathType = ExportSampleImagesViewExtension.Controls.PathType;
 
 namespace ExportSampleImagesViewExtension
 {
@@ -80,12 +82,21 @@ namespace ExportSampleImagesViewExtension
                 }
             }
         }
-        
+
+        /// <summary>
+        /// Collection of graphs loaded for exporting
+        /// </summary>
+        public ObservableCollection<GraphViewModel> Graphs { get; set; } 
+
+        private Dictionary<string, GraphViewModel> graphDictionary = new Dictionary<string, GraphViewModel>();
+
         public PathViewModel SourcePathViewModel { get; set; } 
         public PathViewModel TargetPathViewModel { get; set; } 
         public DelegateCommand OpenGraphsCommand { get; set; }
 
         #endregion
+
+        #region Loading
 
         /// <summary>
         /// Constructor
@@ -112,10 +123,53 @@ namespace ExportSampleImagesViewExtension
                 this.ViewModelCommandExecutive = p.ViewModelCommandExecutive;
             }
 
-            SourcePathViewModel = new PathViewModel { FolderPath = "Test 1 you fucking idiot", Owner = viewLoadedParamsInstance.DynamoWindow };
-            TargetPathViewModel = new PathViewModel { FolderPath = "Test 2 is working god damn it", Owner = viewLoadedParamsInstance.DynamoWindow };
+            TargetPathViewModel = new PathViewModel { Type = PathType.Target, Owner = viewLoadedParamsInstance.DynamoWindow };
+            SourcePathViewModel = new PathViewModel { Type = PathType.Source, Owner = viewLoadedParamsInstance.DynamoWindow };
+
+            SourcePathViewModel.PropertyChanged += SourcePathPropertyChanged;
+
+            Graphs = new ObservableCollection<GraphViewModel>
+            {
+                new GraphViewModel{ GraphName = "Test 1" },
+                new GraphViewModel{ GraphName = "Test 2" },
+                new GraphViewModel{ GraphName = "Test 3" }
+            };
 
             OpenGraphsCommand = new DelegateCommand(OpenGraphs);
+        }
+
+        private void SourcePathPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
+        {
+            var pathVM = sender as PathViewModel;
+            if (pathVM == null || pathVM.Type != PathType.Source) return;
+
+            if (propertyChangedEventArgs.PropertyName == nameof(PathViewModel.FolderPath))
+            {
+                SourceFolderChanged(pathVM);
+            }
+        }
+
+        private void SourceFolderChanged(PathViewModel pathVM)
+        {
+            Graphs = new ObservableCollection<GraphViewModel>();
+            graphDictionary = new Dictionary<string, GraphViewModel>();
+
+            var files = Utilities.Utilities.GetAllFilesOfExtension(pathVM.FolderPath);
+            if (files == null)
+                return;
+
+            foreach (var graph in files)
+            {
+                var name = Path.GetFileNameWithoutExtension(graph);
+                var graphVM = new GraphViewModel { GraphName = name };
+
+                Graphs.Add(graphVM);
+                graphDictionary[name] = graphVM;
+            }
+
+            RaisePropertyChanged(nameof(Graphs));
+
+            //graphDictionary = new Dictionary<string, GraphViewModel>(Graphs.ToDictionary(gf => gf.GraphName));
         }
 
         private void OnCurrentWorkspaceCleared(IWorkspaceModel workspace)
@@ -130,11 +184,6 @@ namespace ExportSampleImagesViewExtension
             CurrentWorkspace.EvaluationCompleted += CurrentWorkspaceOnEvaluationCompleted;
         }
 
-        /// <summary>
-        /// There is a race condition here I cannot currently solve
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void CurrentWorkspaceOnEvaluationCompleted(object sender, EvaluationCompletedEventArgs e)
         {
             CurrentWorkspace.EvaluationCompleted -= CurrentWorkspaceOnEvaluationCompleted;
@@ -151,20 +200,9 @@ namespace ExportSampleImagesViewExtension
             this.DynamoViewModel.Model.WorkspaceOpened += WorkspaceOpened;
         }
 
-        #region Commands
-        private string UpdatePath(object path)
-        {
-            string folder = Utilities.Utilities.GetFolderDialog();
-
-            if (string.IsNullOrEmpty(folder))
-                return string.Empty;
-            if (CurrentWorkspace == null)
-                return string.Empty;
-
-            return folder;
-        }
-        
         #endregion
+
+        #region Methods
 
         private void OpenGraphs(object obj)
         {
@@ -210,25 +248,28 @@ namespace ExportSampleImagesViewExtension
         /// <param name="workspace"></param>
         private void WorkspaceOpened(WorkspaceModel workspace)
         {
-            FileName = Path.GetFileNameWithoutExtension(workspace.FileName);
-
             var homespace = workspace as HomeWorkspaceModel;
             homespace.
 
             FileName += " Run completed?";
         }
 
+        #endregion
+
+        #region Closing
         /// <summary>
         /// Remove event handlers
         /// </summary>
         public void Dispose()
         {
             viewLoadedParamsInstance.CurrentWorkspaceChanged -= OnCurrentWorkspaceOpened;
+            SourcePathViewModel.PropertyChanged -= SourcePathPropertyChanged;
         }
+        #endregion
 
-
+        #region Utility
         /// <summary>
-        ///     Force the Dispatcher to empty it's queue
+        /// Force the Dispatcher to empty it's queue
         /// </summary>
         [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         public static void DoEvents()
@@ -249,5 +290,6 @@ namespace ExportSampleImagesViewExtension
             ((DispatcherFrame)frame).Continue = false;
             return null;
         }
+        #endregion
     }
 }

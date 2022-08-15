@@ -11,11 +11,18 @@ using DynamoUtilities;
 
 namespace ExportSampleImagesViewExtension.Controls
 {
+    public enum PathType { Source, Target }
+
     public class PathViewModel : NotificationObject
     {
         internal Window Owner { get; set; }
-
         private string folderPath;
+
+        /// <summary>
+        /// The purpose of the folder path
+        /// </summary>
+        public PathType Type { get; set; }
+
         /// <summary>
         /// The selected path associated with this control
         /// </summary>
@@ -31,6 +38,7 @@ namespace ExportSampleImagesViewExtension.Controls
                 }
             }
         }
+
 
         /// <summary>
         /// Handles path update call

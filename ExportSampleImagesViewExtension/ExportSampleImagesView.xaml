@@ -45,11 +45,23 @@
             </StackPanel>
 
             <Separator Margin="-20 10"></Separator>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="File Name: " FontSize="10" 
-                       Foreground="{StaticResource PrimaryCharcoal100Brush}" />
-                <TextBlock Text="{Binding FileName}" FontSize="10" Padding="5"></TextBlock>
-            </StackPanel>
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl x:Name="GraphsItemsControl" 
+                              Margin="5"
+                              ItemsSource="{Binding Graphs, UpdateSourceTrigger=PropertyChanged}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <controls:GraphViewControl/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </StackPanel>
 
         <DockPanel HorizontalAlignment="Stretch" Grid.Row="1">

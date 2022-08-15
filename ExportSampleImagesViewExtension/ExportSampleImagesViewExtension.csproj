@@ -200,11 +200,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\FolderPathView.xaml.cs">
-      <DependentUpon>FolderPathView.xaml</DependentUpon>
+    <Compile Include="Controls\GraphViewControl.xaml.cs">
+      <DependentUpon>GraphViewControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\FolderPathViewControl.xaml.cs">
-      <DependentUpon>FolderPathViewControl.xaml</DependentUpon>
+    <Compile Include="Controls\GraphViewModel.cs" />
+    <Compile Include="Controls\PathViewControl.xaml.cs">
+      <DependentUpon>PathViewControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\PathViewModel.cs" />
     <Compile Include="ExportSampleImagesViewExtension.cs" />
@@ -226,11 +227,11 @@
     <Content Include="Windows Logo.png" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Controls\FolderPathView.xaml">
+    <Page Include="Controls\GraphViewControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\FolderPathViewControl.xaml">
+    <Page Include="Controls\PathViewControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
