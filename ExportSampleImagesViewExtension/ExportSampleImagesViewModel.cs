@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
 using System.Security.Permissions;
@@ -7,6 +9,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using Dynamo.Controls;
@@ -18,6 +21,7 @@ using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
 using Dynamo.Views;
 using Dynamo.Wpf.Extensions;
+using ExportSampleImagesViewExtension.Controls;
 
 namespace ExportSampleImagesViewExtension
 {
@@ -76,10 +80,9 @@ namespace ExportSampleImagesViewExtension
                 }
             }
         }
-
-        public DelegateCommand SourceFolderCommand { get; set; }
-        public DelegateCommand TargetFolderCommand { get; set; }
-        public DelegateCommand ExportGraphsCommand { get; set; }
+        
+        public PathViewModel SourcePathViewModel { get; set; } 
+        public PathViewModel TargetPathViewModel { get; set; } 
         public DelegateCommand OpenGraphsCommand { get; set; }
 
         #endregion
@@ -91,6 +94,8 @@ namespace ExportSampleImagesViewExtension
         public ExportSampleImagesViewModel(ViewLoadedParams p)
         {
             if (p == null) return;
+            
+            FileName = "Test Name";
 
             this.viewLoadedParamsInstance = p;
 
@@ -107,9 +112,9 @@ namespace ExportSampleImagesViewExtension
                 this.ViewModelCommandExecutive = p.ViewModelCommandExecutive;
             }
 
-            SourceFolderCommand = new DelegateCommand(SetSourceFolder);
-            TargetFolderCommand = new DelegateCommand(SetTargetFolder);
-            ExportGraphsCommand = new DelegateCommand(ExportGraphs);
+            SourcePathViewModel = new PathViewModel { FolderPath = "Test 1 you fucking idiot", Owner = viewLoadedParamsInstance.DynamoWindow };
+            TargetPathViewModel = new PathViewModel { FolderPath = "Test 2 is working god damn it", Owner = viewLoadedParamsInstance.DynamoWindow };
+
             OpenGraphsCommand = new DelegateCommand(OpenGraphs);
         }
 
@@ -132,13 +137,6 @@ namespace ExportSampleImagesViewExtension
         /// <param name="e"></param>
         private void CurrentWorkspaceOnEvaluationCompleted(object sender, EvaluationCompletedEventArgs e)
         {
-            //FileName = Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName);
-
-            //DoEvents();
-
-            //var path = Path.Combine(TargetPath, "Test" + ".png");
-            //this.DynamoViewModel.SaveImageCommand.Execute(path);
-
             CurrentWorkspace.EvaluationCompleted -= CurrentWorkspaceOnEvaluationCompleted;
         }
         
@@ -154,29 +152,18 @@ namespace ExportSampleImagesViewExtension
         }
 
         #region Commands
-        private void SetSourceFolder(object obj)
+        private string UpdatePath(object path)
         {
             string folder = Utilities.Utilities.GetFolderDialog();
 
             if (string.IsNullOrEmpty(folder))
-                return;
+                return string.Empty;
             if (CurrentWorkspace == null)
-                return;
+                return string.Empty;
 
-            SourcePath = folder;
+            return folder;
         }
-
-        private void SetTargetFolder(object obj)
-        {
-            string folder = Utilities.Utilities.GetFolderDialog();
-
-            if (string.IsNullOrEmpty(folder))
-                return;
-            if (CurrentWorkspace == null)
-                return;
-
-            TargetPath = folder;
-        }
+        
         #endregion
 
         private void OpenGraphs(object obj)
@@ -195,6 +182,12 @@ namespace ExportSampleImagesViewExtension
 
                 DoEvents(); // Allows visual tree to be reconstructed.
 
+                // 2 Cleaunp Nodes
+                this.DynamoViewModel.GraphAutoLayoutCommand.Execute(null);
+
+                DoEvents();
+
+                // 3 Save an image
                 FileName = Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName);
                 var path = Path.Combine(TargetPath, FileName + ".png");
                 this.DynamoViewModel.SaveImageCommand.Execute(path);
@@ -210,27 +203,7 @@ namespace ExportSampleImagesViewExtension
             }
             catch (Exception) { }
         }
-
-        /// <summary>
-        /// Export all the graphs we have found in the destination folder
-        /// </summary>
-        /// <param name="obj"></param>
-        private void ExportGraphs(object obj)
-        {
-            // 3 Export an image
-            SaveGraphToImage();
-        }
         
-        private void SaveGraphToImage()
-        {
-            if (string.IsNullOrEmpty(TargetPath) || string.IsNullOrEmpty(FileName)) 
-                return;
-
-            var path = Path.Combine(TargetPath, FileName + ".png");
-            
-            this.DynamoViewModel.SaveImageCommand.Execute(path); 
-        }
-
         /// <summary>
         /// Triggers when the graph view opens
         /// </summary>
@@ -243,13 +216,6 @@ namespace ExportSampleImagesViewExtension
             homespace.
 
             FileName += " Run completed?";
-
-            // 2 Prepare the graph for exporting 
-            //CleanUpGraph();
-
-            // 3 Export an image
-            //SaveGraphToImage();
-            //CloseGraph();
         }
 
         /// <summary>

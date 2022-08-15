@@ -4,11 +4,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:ui="clr-namespace:Dynamo.UI;assembly=DynamoCoreWpf"
-             xmlns:local="clr-namespace:ExportSampleImagesViewExtension"
+             xmlns:controls="clr-namespace:ExportSampleImagesViewExtension.Controls"
              UseLayoutRounding="True"
              SnapsToDevicePixels="True"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -19,6 +20,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
+
     <Grid x:Name="MainGrid" Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"></RowDefinition>
@@ -26,60 +28,22 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Vertical">
-            <Grid VerticalAlignment="Top">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="110"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <Label 
-                    Content="Source folder: " 
-                    Grid.Column="0" 
-                    VerticalAlignment="Top" 
-                    VerticalContentAlignment="Top" 
-                    Foreground="{StaticResource PrimaryCharcoal100Brush}" 
-                    FontSize="10"></Label>
-                <Border Grid.Column="1" BorderBrush="{x:Null}">
-                    <TextBlock Text="{Binding SourcePath}" TextWrapping="Wrap" VerticalAlignment="Top" Padding="5" FontSize="10"></TextBlock>
-                </Border>
-                <Button Content="..." Grid.Column="2"
-                        Command="{Binding SourceFolderCommand}"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        DockPanel.Dock="Right"
-                        Background="White"
-                        BorderBrush="#BFBFBF"
-                        Foreground="#3C3C3C"
-                        Width="50"
-                        Style="{StaticResource SolidButtonStyleSmaller}"/>
-            </Grid>
-            <Grid VerticalAlignment="Top" Margin="0 5">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="110"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-                <Label 
-                    Content="Destination folder: " 
-                    Grid.Column="0" 
-                    VerticalAlignment="Top" 
-                    VerticalContentAlignment="Top" 
-                    Foreground="{StaticResource PrimaryCharcoal100Brush}" 
-                    FontSize="10"></Label>
-                <Border Grid.Column="1" BorderBrush="{x:Null}">
-                    <TextBlock Text="{Binding TargetPath}" TextWrapping="Wrap" VerticalAlignment="Top" Padding="5" FontSize="10"></TextBlock>
-                </Border>
-                <Button Content="..." Grid.Column="2"
-                        Command="{Binding TargetFolderCommand}"
-                        HorizontalAlignment="Right"
-                        VerticalAlignment="Top"
-                        DockPanel.Dock="Right"
-                        Background="White"
-                        BorderBrush="#BFBFBF"
-                        Foreground="#3C3C3C"
-                        Width="50"
-                        Style="{StaticResource SolidButtonStyleSmaller}"/>
-            </Grid> 
+
+            <StackPanel>
+                <Label Content="Source folder"     
+                       Padding="5,5,5,5"
+                       FontSize="13"
+                       FontFamily="{StaticResource ArtifaktElementBold}"
+                       Foreground="{StaticResource PreferencesWindowFontColor}"></Label>
+                <controls:FolderPathViewControl DataContext="{Binding SourcePathViewModel}" Margin="0 0 0 10"/>
+                <Label Content="Target folder" 
+                       Padding="5,5,5,5"
+                       FontSize="13"
+                       FontFamily="{StaticResource ArtifaktElementBold}"
+                       Foreground="{StaticResource PreferencesWindowFontColor}"></Label>
+                <controls:FolderPathViewControl DataContext="{Binding TargetPathViewModel}" Margin="0 0 0 10"/>
+            </StackPanel>
+
             <Separator Margin="-20 10"></Separator>
             <StackPanel Orientation="Horizontal">
                 <Label Content="File Name: " FontSize="10" 
@@ -89,15 +53,7 @@
         </StackPanel>
 
         <DockPanel HorizontalAlignment="Stretch" Grid.Row="1">
-            <Button Content="Save Image"
-                    Command="{Binding ExportGraphsCommand}"
-                    DockPanel.Dock="Right"
-                    HorizontalAlignment="Right"
-                    Background="White"
-                    BorderBrush="#BFBFBF"
-                    Foreground="#3C3C3C"
-                    Style="{StaticResource SolidButtonStyleSmaller}"/>
-            <Button Content="Open"
+            <Button Content="Run"
                     Margin="5 0"
                     Command="{Binding OpenGraphsCommand}"
                     DockPanel.Dock="Right"

@@ -149,6 +149,7 @@
     <Reference Include="System.Core">
       <Private>False</Private>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>
       <Private>False</Private>
@@ -199,6 +200,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\FolderPathView.xaml.cs">
+      <DependentUpon>FolderPathView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\FolderPathViewControl.xaml.cs">
+      <DependentUpon>FolderPathViewControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PathViewModel.cs" />
     <Compile Include="ExportSampleImagesViewExtension.cs" />
     <Compile Include="ExportSampleImagesView.xaml.cs">
       <DependentUpon>ExportSampleImagesView.xaml</DependentUpon>
@@ -218,6 +226,14 @@
     <Content Include="Windows Logo.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Controls\FolderPathView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\FolderPathViewControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ExportSampleImagesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
