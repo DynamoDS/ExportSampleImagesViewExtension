@@ -44,11 +44,11 @@
                 <controls:FolderPathViewControl DataContext="{Binding TargetPathViewModel}" Margin="0 0 0 10"/>
             </StackPanel>
 
-            <Separator Margin="-20 10"></Separator>
+            <Separator Margin="-25 10"></Separator>
 
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <ItemsControl x:Name="GraphsItemsControl" 
-                              Margin="5"
+                              Margin="0 5"
                               ItemsSource="{Binding Graphs, UpdateSourceTrigger=PropertyChanged}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>

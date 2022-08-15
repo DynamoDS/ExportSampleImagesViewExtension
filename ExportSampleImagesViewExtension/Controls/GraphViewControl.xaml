@@ -4,14 +4,28 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:ExportSampleImagesViewExtension.Controls"
+             xmlns:controls="clr-namespace:Dynamo.Controls;assembly=DynamoCoreWpf"
              mc:Ignorable="d" 
              d:DesignHeight="40" d:DesignWidth="800">
-    <Grid>
+    <UserControl.Resources>
+        <controls:BooleanToBrushConverter
+            x:Key="BooleanToBrushConverter"
+            FalseBrush="#252525"
+            TrueBrush="#6AC0E7" />
+    </UserControl.Resources>
+    <Grid Margin="0 5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Ellipse Width="6" Height="6" Fill="LimeGreen" Margin="5"></Ellipse>
-        <TextBlock Grid.Column="1" Text="{Binding GraphName}"></TextBlock>
+        <Ellipse 
+            Width="6" 
+            Height="6" 
+            Fill="{Binding Exported, Converter={StaticResource BooleanToBrushConverter}}" 
+            Margin="0"></Ellipse>
+        <TextBlock 
+            Grid.Column="1" 
+            Text="{Binding GraphName}" 
+            Margin="10 0"></TextBlock>
     </Grid>
 </UserControl>

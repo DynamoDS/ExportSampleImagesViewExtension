@@ -128,12 +128,12 @@ namespace ExportSampleImagesViewExtension
 
             SourcePathViewModel.PropertyChanged += SourcePathPropertyChanged;
 
-            Graphs = new ObservableCollection<GraphViewModel>
-            {
-                new GraphViewModel{ GraphName = "Test 1" },
-                new GraphViewModel{ GraphName = "Test 2" },
-                new GraphViewModel{ GraphName = "Test 3" }
-            };
+            //Graphs = new ObservableCollection<GraphViewModel>
+            //{
+            //    new GraphViewModel{ GraphName = "Test 1" },
+            //    new GraphViewModel{ GraphName = "Test 2" },
+            //    new GraphViewModel{ GraphName = "Test 3" }
+            //};
 
             OpenGraphsCommand = new DelegateCommand(OpenGraphs);
         }
@@ -168,8 +168,6 @@ namespace ExportSampleImagesViewExtension
             }
 
             RaisePropertyChanged(nameof(Graphs));
-
-            //graphDictionary = new Dictionary<string, GraphViewModel>(Graphs.ToDictionary(gf => gf.GraphName));
         }
 
         private void OnCurrentWorkspaceCleared(IWorkspaceModel workspace)
@@ -206,10 +204,10 @@ namespace ExportSampleImagesViewExtension
 
         private void OpenGraphs(object obj)
         {
-            if (string.IsNullOrEmpty(SourcePath) || string.IsNullOrEmpty(TargetPath))
+            if (string.IsNullOrEmpty(SourcePathViewModel.FolderPath) || string.IsNullOrEmpty(TargetPathViewModel.FolderPath))
                 return;
 
-            var files = Utilities.Utilities.GetAllFilesOfExtension(SourcePath);
+            var files = Utilities.Utilities.GetAllFilesOfExtension(SourcePathViewModel.FolderPath);
             if (files == null)
                 return;
 
@@ -226,9 +224,13 @@ namespace ExportSampleImagesViewExtension
                 DoEvents();
 
                 // 3 Save an image
-                FileName = Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName);
-                var path = Path.Combine(TargetPath, FileName + ".png");
+                var graphName = Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName);
+                var path = Path.Combine(TargetPathViewModel.FolderPath, graphName + ".png");
+
                 this.DynamoViewModel.SaveImageCommand.Execute(path);
+
+                // 4 Update the UI
+                graphDictionary[graphName].Exported = true;
             }
         }
 

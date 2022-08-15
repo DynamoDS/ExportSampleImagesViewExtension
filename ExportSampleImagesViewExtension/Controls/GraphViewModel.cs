@@ -26,11 +26,11 @@ namespace ExportSampleImagesViewExtension.Controls
             }
         }
 
-        private string exported;
+        private bool exported = false;
         /// <summary>
         /// Shows if the graph has been successfully exported
         /// </summary>
-        public string Exported
+        public bool Exported
         {
             get { return exported; }
             set
