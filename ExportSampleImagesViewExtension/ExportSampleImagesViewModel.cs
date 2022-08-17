@@ -46,6 +46,8 @@ namespace ExportSampleImagesViewExtension
         private string targetPath;
         private string fileName;
 
+        private List<string> cleanupImageList = new List<string>();
+
         public string SourcePath
         {
             get { return sourcePath; }
@@ -234,6 +236,8 @@ namespace ExportSampleImagesViewExtension
 
                 DoEvents();
             }
+
+            CleanUp();
         }
 
         private void ExportCombinedImages(string graphName)
@@ -245,34 +249,44 @@ namespace ExportSampleImagesViewExtension
             this.DynamoViewModel.SaveImageCommand.Execute(pathForeground);
 
             OverlayImages(graphName, pathBackground, pathForeground);
-            //CleanUp(pathBackground, pathForeground);
+
+            cleanupImageList.Add(pathForeground);
+            cleanupImageList.Add(pathBackground);
         }
 
-        private void CleanUp(string pathBackground, string pathForeground)
+        private void CleanUp()
         {
-            File.Delete(pathBackground);
-            File.Delete(pathForeground);
+            if (cleanupImageList == null || cleanupImageList.Count == 0) return;
+
+            foreach (var image in cleanupImageList)
+            {
+                File.Delete(image);
+            }
         }
 
         private void OverlayImages(string name, string background, string foreground)
         {
-            var baseImage = (Bitmap)Image.FromFile(background);
-            var overlayImage = (Bitmap)Image.FromFile(foreground);
-            overlayImage = Resize(baseImage, overlayImage);
+            using (var baseImage = (Bitmap) Image.FromFile(background))
+            {
+                using (var overlayImage = (Bitmap) Image.FromFile(foreground))
+                {
+                    var resizedImage = Resize(baseImage, overlayImage);
 
-            var finalImage = new Bitmap(baseImage.Width, baseImage.Height, PixelFormat.Format32bppArgb);
-            finalImage.SetResolution(120, 120);
-            var graphics = Graphics.FromImage(finalImage);
+                    var finalImage = new Bitmap(baseImage.Width, baseImage.Height, PixelFormat.Format32bppArgb);
+                    finalImage.SetResolution(120, 120);
+                    var graphics = Graphics.FromImage(finalImage);
 
-            graphics.CompositingMode = CompositingMode.SourceOver;
+                    graphics.CompositingMode = CompositingMode.SourceOver;
 
-            graphics.DrawImage(baseImage, 0, 0);
-            graphics.DrawImage(overlayImage, 
-                Convert.ToInt32((baseImage.Width - overlayImage.Width) * (float)0.5), 
-                Convert.ToInt32((baseImage.Height - overlayImage.Height) * (float)0.5));    // Center the overlaid image
-            
-            //save the final composite image to disk
-            finalImage.Save(Path.Combine(TargetPathViewModel.FolderPath, name + ".png"), ImageFormat.Png);
+                    graphics.DrawImage(baseImage, 0, 0);
+                    graphics.DrawImage(resizedImage, 
+                        Convert.ToInt32((baseImage.Width - resizedImage.Width) * (float)0.5), 
+                        Convert.ToInt32((baseImage.Height - resizedImage.Height) * (float)0.5));    // Center the overlaid image
+                    
+                    //save the final composite image to disk
+                    finalImage.Save(Path.Combine(TargetPathViewModel.FolderPath, name + ".png"), ImageFormat.Png);
+                }
+            }
         }
 
         private Bitmap Resize(Bitmap sourceImg, Bitmap targetImg)
