@@ -225,9 +225,11 @@ namespace ExportSampleImagesViewExtension
 
                 // 3 Save an image
                 var graphName = Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName);
-                var path = Path.Combine(TargetPathViewModel.FolderPath, graphName + ".png");
+                var pathForeground = Path.Combine(TargetPathViewModel.FolderPath, graphName + "_f.png");
+                var pathBackground = Path.Combine(TargetPathViewModel.FolderPath, graphName + "_b.png");
 
-                this.DynamoViewModel.SaveImageCommand.Execute(path);
+                this.DynamoViewModel.Save3DImageCommand.Execute(pathBackground);
+                this.DynamoViewModel.SaveImageCommand.Execute(pathForeground);
 
                 // 4 Update the UI
                 graphDictionary[graphName].Exported = true;

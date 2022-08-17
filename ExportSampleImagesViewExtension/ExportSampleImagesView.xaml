@@ -29,6 +29,7 @@
 
         <StackPanel Orientation="Vertical">
 
+            <!-- Folder selection controls -->
             <StackPanel>
                 <Label Content="Source folder"     
                        Padding="5,5,5,5"
@@ -46,9 +47,16 @@
 
             <Separator Margin="-25 10"></Separator>
 
+            <!-- Graphs to be exported -->
+            <Label Content="Graphs to export" 
+                   Padding="5,5,5,5"
+                   FontSize="13"
+                   FontFamily="{StaticResource ArtifaktElementBold}"
+                   Foreground="{StaticResource PreferencesWindowFontColor}"></Label>
+
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <ItemsControl x:Name="GraphsItemsControl" 
-                              Margin="0 5"
+                              Margin="5"
                               ItemsSource="{Binding Graphs, UpdateSourceTrigger=PropertyChanged}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -65,7 +73,7 @@
         </StackPanel>
 
         <DockPanel HorizontalAlignment="Stretch" Grid.Row="1">
-            <Button Content="Run"
+            <Button Content="Export"
                     Margin="5 0"
                     Command="{Binding OpenGraphsCommand}"
                     DockPanel.Dock="Right"
@@ -73,7 +81,7 @@
                     Background="White"
                     BorderBrush="#BFBFBF"
                     Foreground="#3C3C3C"
-                    Style="{StaticResource SolidButtonStyleSmaller}"/>
+                    Style="{StaticResource CtaButtonStyle}"/>
         </DockPanel> 
     </Grid>
 </UserControl>
