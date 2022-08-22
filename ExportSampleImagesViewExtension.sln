@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportSampleImagesViewExtension", "ExportSampleImagesViewExtension\ExportSampleImagesViewExtension.csproj", "{947585DA-1FFF-4C43-B2C9-661282F0275F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportSampleImages", "ExportSampleImagesViewExtension\ExportSampleImages.csproj", "{947585DA-1FFF-4C43-B2C9-661282F0275F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExportSampleImagesTests", "ExportSampleImagesTests\ExportSampleImagesTests.csproj", "{AA82B38F-A6B9-45EB-85E9-5DD21D1D2A17}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{947585DA-1FFF-4C43-B2C9-661282F0275F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{947585DA-1FFF-4C43-B2C9-661282F0275F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{947585DA-1FFF-4C43-B2C9-661282F0275F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA82B38F-A6B9-45EB-85E9-5DD21D1D2A17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA82B38F-A6B9-45EB-85E9-5DD21D1D2A17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA82B38F-A6B9-45EB-85E9-5DD21D1D2A17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA82B38F-A6B9-45EB-85E9-5DD21D1D2A17}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

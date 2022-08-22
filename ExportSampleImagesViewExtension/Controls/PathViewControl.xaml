@@ -1,19 +1,21 @@
-﻿<UserControl x:Class="ExportSampleImagesViewExtension.Controls.FolderPathViewControl"
+﻿<UserControl x:Class="ExportSampleImages.Controls.FolderPathViewControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ExportSampleImagesViewExtension.Controls"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:ExportSampleImages.Controls"
              xmlns:ui="clr-namespace:Dynamo.UI;assembly=DynamoCoreWpf"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DataContext="{d:DesignInstance local:PathViewModel, IsDesignTimeCreatable=False}">
 
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ui:SharedResourceDictionary Source="{x:Static ui:SharedDictionaryManager.DynamoModernDictionaryUri}" />
-                <ui:SharedResourceDictionary Source="{x:Static ui:SharedDictionaryManager.DynamoConvertersDictionaryUri}" />
-                <ui:SharedResourceDictionary Source="{x:Static ui:SharedDictionaryManager.DynamoColorsAndBrushesDictionaryUri}" />
+                <ui:SharedResourceDictionary
+                    Source="{x:Static ui:SharedDictionaryManager.DynamoConvertersDictionaryUri}" />
+                <ui:SharedResourceDictionary
+                    Source="{x:Static ui:SharedDictionaryManager.DynamoColorsAndBrushesDictionaryUri}" />
                 <ui:SharedResourceDictionary Source="{x:Static ui:SharedDictionaryManager.DynamoModernDictionaryUri}" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -21,13 +23,13 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"></ColumnDefinition>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <!--the path text-->
-        <TextBlock x:Name="PathTextBlock" 
-                   Style="{StaticResource DarkTextBlock}" 
+        <TextBlock x:Name="PathTextBlock"
+                   Style="{StaticResource DarkTextBlock}"
                    Text="{Binding FolderPath}"
                    Grid.Column="0"
                    Margin="5"
@@ -36,9 +38,9 @@
                    MinHeight="24"
                    Padding="8 6 4 4"
                    ToolTip="{Binding FolderPath}"
-                   Foreground="{StaticResource PreferencesWindowFontColor}"/>
-        <TextBlock x:Name="PlaceholderTextBlock" 
-                   Style="{StaticResource DarkTextBlock}" 
+                   Foreground="{StaticResource PreferencesWindowFontColor}" />
+        <TextBlock x:Name="PlaceholderTextBlock"
+                   Style="{StaticResource DarkTextBlock}"
                    Visibility="{Binding FolderPath, Converter={StaticResource NonEmptyStringToCollapsedConverter}}"
                    Text="Select folder .."
                    FontSize="10"
@@ -49,18 +51,18 @@
                    MinHeight="24"
                    Padding="8 6 4 4"
                    ToolTip="{Binding FolderPath}"
-                   Foreground="{StaticResource PreferencesWindowButtonMouseOverFontColor}"/>
-   
+                   Foreground="{StaticResource PreferencesWindowButtonMouseOverFontColor}" />
+
         <!--the the edit path button-->
-        <Button    Grid.Column="1"
-                   Margin="10 0 0 0"
-                   x:Name="UpdatePathButton"
-                   Command="{Binding Path=UpdatePathCommand}"
-                   ToolTipService.ShowOnDisabled="True"
-                   Background="{StaticResource PreferencesWindowBackgroundColor}"
-                   Style="{StaticResource EditFolderButtonStyle}">
+        <Button Grid.Column="1"
+                Margin="10 0 0 0"
+                x:Name="UpdatePathButton"
+                Command="{Binding Path=UpdatePathCommand}"
+                ToolTipService.ShowOnDisabled="True"
+                Background="{StaticResource PreferencesWindowBackgroundColor}"
+                Style="{StaticResource EditFolderButtonStyle}">
             <Button.ToolTip>
-                <ToolTip Content="Select folder." Style="{StaticResource GenericToolTipLight}"/>
+                <ToolTip Content="Select folder." Style="{StaticResource GenericToolTipLight}" />
             </Button.ToolTip>
         </Button>
     </Grid>

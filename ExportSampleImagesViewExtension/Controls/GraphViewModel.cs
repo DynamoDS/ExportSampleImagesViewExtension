@@ -1,21 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Dynamo.Core;
+﻿using Dynamo.Core;
 
-namespace ExportSampleImagesViewExtension.Controls
+namespace ExportSampleImages.Controls
 {
     public class GraphViewModel : NotificationObject
     {
+        private bool exported;
         private string graphName;
+
         /// <summary>
-        /// The name of the Graph
+        ///     The name of the Graph
         /// </summary>
         public string GraphName
         {
-            get { return graphName; }
+            get => graphName;
             set
             {
                 if (value != graphName)
@@ -26,13 +23,12 @@ namespace ExportSampleImagesViewExtension.Controls
             }
         }
 
-        private bool exported = false;
         /// <summary>
-        /// Shows if the graph has been successfully exported
+        ///     Shows if the graph has been successfully exported
         /// </summary>
         public bool Exported
         {
-            get { return exported; }
+            get => exported;
             set
             {
                 if (value != exported)

@@ -1,21 +1,23 @@
-﻿<UserControl x:Class="ExportSampleImagesViewExtension.ExportSampleImagesView"
+﻿<UserControl x:Class="ExportSampleImages.ExportSampleImagesView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ui="clr-namespace:Dynamo.UI;assembly=DynamoCoreWpf"
-             xmlns:controls="clr-namespace:ExportSampleImagesViewExtension.Controls"
+             xmlns:controls="clr-namespace:ExportSampleImages.Controls"
              UseLayoutRounding="True"
              SnapsToDevicePixels="True"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ui:SharedResourceDictionary Source="{x:Static ui:SharedDictionaryManager.DynamoModernDictionaryUri}" />
-                <ui:SharedResourceDictionary Source="{x:Static ui:SharedDictionaryManager.DynamoConvertersDictionaryUri}" />
-                <ui:SharedResourceDictionary Source="{x:Static ui:SharedDictionaryManager.DynamoColorsAndBrushesDictionaryUri}" />
+                <ui:SharedResourceDictionary
+                    Source="{x:Static ui:SharedDictionaryManager.DynamoConvertersDictionaryUri}" />
+                <ui:SharedResourceDictionary
+                    Source="{x:Static ui:SharedDictionaryManager.DynamoColorsAndBrushesDictionaryUri}" />
                 <ui:SharedResourceDictionary Source="{x:Static ui:SharedDictionaryManager.DynamoModernDictionaryUri}" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -23,25 +25,25 @@
 
     <Grid x:Name="MainGrid" Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="auto"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <!-- Folder selection controls -->
         <StackPanel Orientation="Vertical">
-            <Label Content="Source folder"     
+            <Label Content="Source folder"
                    Padding="5,5,5,5"
                    FontSize="13"
                    FontFamily="{StaticResource ArtifaktElementBold}"
-                   Foreground="{StaticResource PreferencesWindowFontColor}"></Label>
-            <controls:FolderPathViewControl DataContext="{Binding SourcePathViewModel}" Margin="0 0 0 10"/>
-            <Label Content="Target folder" 
+                   Foreground="{StaticResource PreferencesWindowFontColor}" />
+            <controls:FolderPathViewControl DataContext="{Binding SourcePathViewModel}" Margin="0 0 0 10" />
+            <Label Content="Target folder"
                    Padding="5,5,5,5"
                    FontSize="13"
                    FontFamily="{StaticResource ArtifaktElementBold}"
-                   Foreground="{StaticResource PreferencesWindowFontColor}"></Label>
-            <controls:FolderPathViewControl DataContext="{Binding TargetPathViewModel}" Margin="0 0 0 10"/>
+                   Foreground="{StaticResource PreferencesWindowFontColor}" />
+            <controls:FolderPathViewControl DataContext="{Binding TargetPathViewModel}" Margin="0 0 0 10" />
         </StackPanel>
 
         <!-- Export button -->
@@ -54,37 +56,37 @@
                     Background="White"
                     BorderBrush="#BFBFBF"
                     Foreground="#3C3C3C"
-                    Style="{StaticResource CtaButtonStyle}"/>
+                    Style="{StaticResource CtaButtonStyle}" />
         </DockPanel>
 
-        <Separator Margin="-25 0" Grid.Row="2" VerticalAlignment="Top" Background="{StaticResource DarkGreyBrush}"></Separator>
+        <Separator Margin="-25 0" Grid.Row="2" VerticalAlignment="Top" Background="{StaticResource DarkGreyBrush}" />
 
         <!-- Graphs to be exported -->
         <Grid Grid.Row="2" Margin="0 15 0 0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <Label Content="Graphs to export" 
+            <Label Content="Graphs to export"
                    Padding="5,5,5,5"
                    FontSize="13"
                    FontFamily="{StaticResource ArtifaktElementBold}"
-                   Foreground="{StaticResource PreferencesWindowFontColor}"></Label>
+                   Foreground="{StaticResource PreferencesWindowFontColor}" />
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto" 
+            <ScrollViewer VerticalScrollBarVisibility="Auto"
                           Grid.Row="1"
                           MaxHeight="450" Margin="1 5 -4 5">
-                <ItemsControl x:Name="GraphsItemsControl" 
+                <ItemsControl x:Name="GraphsItemsControl"
                               Margin="5"
                               ItemsSource="{Binding Graphs, UpdateSourceTrigger=PropertyChanged}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <StackPanel Orientation="Vertical"/>
+                            <StackPanel Orientation="Vertical" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <controls:GraphViewControl/>
+                            <controls:GraphViewControl />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

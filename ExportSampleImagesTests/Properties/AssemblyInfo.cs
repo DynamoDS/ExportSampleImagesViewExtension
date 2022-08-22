@@ -1,14 +1,15 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ExportSampleImagesViewExtension")]
+[assembly: AssemblyTitle("ExportSampleImagesTests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("ExportSampleImagesViewExtension")]
+[assembly: AssemblyProduct("ExportSampleImagesTests")]
 [assembly: AssemblyCopyright("Copyright ©  2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -19,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("947585da-1fff-4c43-b2c9-661282f0275f")]
+[assembly: Guid("aa82b38f-a6b9-45eb-85e9-5dd21d1d2a17")]
 
 // Version information for an assembly consists of the following four values:
 //

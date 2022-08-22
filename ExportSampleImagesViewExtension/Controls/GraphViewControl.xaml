@@ -1,32 +1,31 @@
-﻿<UserControl x:Class="ExportSampleImagesViewExtension.Controls.GraphViewControl"
+﻿<UserControl x:Class="ExportSampleImages.Controls.GraphViewControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:ExportSampleImagesViewExtension.Controls"
-             xmlns:controls="clr-namespace:Dynamo.Controls;assembly=DynamoCoreWpf"
-             mc:Ignorable="d" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:ExportSampleImages.Controls"
+             mc:Ignorable="d"
              d:DesignHeight="40" d:DesignWidth="800">
     <UserControl.Resources>
-        <local:BooleanToImageSourceConverter x:Key="BooleanToImageSourceConverter"/>
+        <local:BooleanToImageSourceConverter x:Key="BooleanToImageSourceConverter" />
     </UserControl.Resources>
     <Grid Margin="0 5">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>
-            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
         <!-- Progress icon -->
-        <Image 
-            Width="12" 
-            Height="12" 
+        <Image
+            Width="12"
+            Height="12"
             Source="{Binding Exported, Converter={StaticResource BooleanToImageSourceConverter}}"
-            Margin="0"/>
+            Margin="0" />
 
         <!-- Graph name -->
-        <TextBlock 
-            Grid.Column="1" 
-            Text="{Binding GraphName}" 
-            Margin="10 0"></TextBlock>
+        <TextBlock
+            Grid.Column="1"
+            Text="{Binding GraphName}"
+            Margin="10 0" />
     </Grid>
 </UserControl>

@@ -2,172 +2,113 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics.Eventing.Reader;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Security.Permissions;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Forms;
 using System.Windows.Threading;
-using Dynamo.Controls;
 using Dynamo.Core;
-using Dynamo.Extensions;
 using Dynamo.Graph.Workspaces;
 using Dynamo.Models;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
-using Dynamo.Views;
 using Dynamo.Wpf.Extensions;
-using ExportSampleImagesViewExtension.Controls;
-using PathType = ExportSampleImagesViewExtension.Controls.PathType;
-using Point = System.Windows.Point;
+using ExportSampleImages.Controls;
 
-namespace ExportSampleImagesViewExtension
+namespace ExportSampleImages
 {
     public class ExportSampleImagesViewModel : NotificationObject, IDisposable
     {
-        #region Fields and Properties
-        private readonly ViewLoadedParams viewLoadedParamsInstance;
-
-        //private readonly Window dynamoWindow;
-        internal DynamoViewModel DynamoViewModel;
-        internal HomeWorkspaceModel CurrentWorkspace;
-
-        private readonly ViewModelCommandExecutive ViewModelExecutive;
-        private readonly ICommandExecutive CommandExecutive;
-        private readonly ViewModelCommandExecutive ViewModelCommandExecutive;
-
-        private string sourcePath;
-        private string targetPath;
-        private string fileName;
-
-        private List<string> cleanupImageList = new List<string>();
-
-        public string SourcePath
-        {
-            get { return sourcePath; }
-            set
-            {
-                if (value != sourcePath)
-                {
-                    sourcePath = value;
-                    RaisePropertyChanged(nameof(SourcePath));
-                }
-            }
-        }
-
-        public string TargetPath
-        {
-            get { return targetPath; }
-            set
-            {
-                if (value != targetPath)
-                {
-                    targetPath = value;
-                    RaisePropertyChanged(nameof(TargetPath));
-                }
-            }
-        }
-
-        public string FileName
-        {
-            get { return fileName; }
-            set
-            {
-                if (value != fileName)
-                {
-                    fileName = value;
-                    RaisePropertyChanged(nameof(FileName));
-                }
-            }
-        }
+        #region Closing
 
         /// <summary>
-        /// Collection of graphs loaded for exporting
+        ///     Remove event handlers
         /// </summary>
-        public ObservableCollection<GraphViewModel> Graphs { get; set; } 
+        public void Dispose()
+        {
+            SourcePathViewModel.PropertyChanged -= SourcePathPropertyChanged;
+        }
 
+        #endregion
+
+        #region Fields and Properties
+
+        private readonly ViewLoadedParams viewLoadedParamsInstance;
+        internal DynamoViewModel DynamoViewModel;
+        internal HomeWorkspaceModel CurrentWorkspace;
+        private readonly List<string> cleanupImageList = new List<string>();
         private Dictionary<string, GraphViewModel> graphDictionary = new Dictionary<string, GraphViewModel>();
 
-        public PathViewModel SourcePathViewModel { get; set; } 
-        public PathViewModel TargetPathViewModel { get; set; } 
-        public DelegateCommand OpenGraphsCommand { get; set; }
+        /// <summary>
+        ///     Collection of graphs loaded for exporting
+        /// </summary>
+        public ObservableCollection<GraphViewModel> Graphs { get; set; }
+
+        /// <summary>
+        ///     The source path containing dynamo graphs to be exported
+        /// </summary>
+        public PathViewModel SourcePathViewModel { get; set; }
+
+        /// <summary>
+        ///     The target path where the images will be stored
+        /// </summary>
+        public PathViewModel TargetPathViewModel { get; set; }
+
+        public DelegateCommand ExportGraphsCommand { get; set; }
 
         #endregion
 
         #region Loading
 
         /// <summary>
-        /// Constructor
+        ///     Constructor
         /// </summary>
         /// <param name="p"></param>
         public ExportSampleImagesViewModel(ViewLoadedParams p)
         {
             if (p == null) return;
-            
-            FileName = "Test Name";
 
-            this.viewLoadedParamsInstance = p;
+            viewLoadedParamsInstance = p;
 
             p.CurrentWorkspaceChanged += OnCurrentWorkspaceChanged;
             p.CurrentWorkspaceCleared += OnCurrentWorkspaceCleared;
 
-            if (this.viewLoadedParamsInstance.CurrentWorkspaceModel is HomeWorkspaceModel)
+            if (viewLoadedParamsInstance.CurrentWorkspaceModel is HomeWorkspaceModel)
             {
-                this.CurrentWorkspace = this.viewLoadedParamsInstance.CurrentWorkspaceModel as HomeWorkspaceModel;
-                this.DynamoViewModel = this.viewLoadedParamsInstance.DynamoWindow.DataContext as DynamoViewModel;
-
-                this.ViewModelExecutive = p.ViewModelCommandExecutive;
-                this.CommandExecutive = p.CommandExecutive;
-                this.ViewModelCommandExecutive = p.ViewModelCommandExecutive;
+                CurrentWorkspace = viewLoadedParamsInstance.CurrentWorkspaceModel as HomeWorkspaceModel;
+                DynamoViewModel = viewLoadedParamsInstance.DynamoWindow.DataContext as DynamoViewModel;
             }
 
-            TargetPathViewModel = new PathViewModel { Type = PathType.Target, Owner = viewLoadedParamsInstance.DynamoWindow };
-            SourcePathViewModel = new PathViewModel { Type = PathType.Source, Owner = viewLoadedParamsInstance.DynamoWindow };
+            TargetPathViewModel = new PathViewModel
+                {Type = PathType.Target, Owner = viewLoadedParamsInstance.DynamoWindow};
+            SourcePathViewModel = new PathViewModel
+                {Type = PathType.Source, Owner = viewLoadedParamsInstance.DynamoWindow};
 
             SourcePathViewModel.PropertyChanged += SourcePathPropertyChanged;
 
-            //Graphs = new ObservableCollection<GraphViewModel>
-            //{
-            //    new GraphViewModel{ GraphName = "Test 1" },
-            //    new GraphViewModel{ GraphName = "Test 2" },
-            //    new GraphViewModel{ GraphName = "Test 3" }
-            //};
-
-            OpenGraphsCommand = new DelegateCommand(OpenGraphs);
+            ExportGraphsCommand = new DelegateCommand(ExportGraphs);
         }
 
+        // Handles source path changed
         private void SourcePathPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
         {
             var pathVM = sender as PathViewModel;
             if (pathVM == null || pathVM.Type != PathType.Source) return;
-
-            if (propertyChangedEventArgs.PropertyName == nameof(PathViewModel.FolderPath))
-            {
-                SourceFolderChanged(pathVM);
-            }
+            if (propertyChangedEventArgs.PropertyName == nameof(PathViewModel.FolderPath)) SourceFolderChanged(pathVM);
         }
 
+        // Update graphs if source folder is changed by the UI
         private void SourceFolderChanged(PathViewModel pathVM)
         {
             Graphs = new ObservableCollection<GraphViewModel>();
             graphDictionary = new Dictionary<string, GraphViewModel>();
 
-            var files = Utilities.Utilities.GetAllFilesOfExtension(pathVM.FolderPath);
+            var files = Utilities.GetAllFilesOfExtension(pathVM.FolderPath);
             if (files == null)
                 return;
 
             foreach (var graph in files)
             {
                 var name = Path.GetFileNameWithoutExtension(graph);
-                var graphVM = new GraphViewModel { GraphName = name };
+                var graphVM = new GraphViewModel {GraphName = name};
 
                 Graphs.Add(graphVM);
                 graphDictionary[name] = graphVM;
@@ -178,13 +119,14 @@ namespace ExportSampleImagesViewExtension
 
         private void OnCurrentWorkspaceCleared(IWorkspaceModel workspace)
         {
-            CurrentWorkspace = this.viewLoadedParamsInstance.CurrentWorkspaceModel as HomeWorkspaceModel;
+            CurrentWorkspace = viewLoadedParamsInstance.CurrentWorkspaceModel as HomeWorkspaceModel;
         }
 
         private void OnCurrentWorkspaceChanged(IWorkspaceModel workspace)
         {
             CurrentWorkspace = workspace as HomeWorkspaceModel;
-            
+            if (CurrentWorkspace == null) return;
+
             CurrentWorkspace.EvaluationCompleted += CurrentWorkspaceOnEvaluationCompleted;
         }
 
@@ -192,28 +134,22 @@ namespace ExportSampleImagesViewExtension
         {
             CurrentWorkspace.EvaluationCompleted -= CurrentWorkspaceOnEvaluationCompleted;
         }
-        
-        private void OnCurrentWorkspaceOpened(IWorkspaceModel workspace)
-        {
-            if (workspace as HomeWorkspaceModel == null) return;
-
-            this.CurrentWorkspace = workspace as HomeWorkspaceModel;
-            this.DynamoViewModel = this.viewLoadedParamsInstance.DynamoWindow.DataContext as DynamoViewModel;
-
-            if (this.DynamoViewModel == null) return;
-            this.DynamoViewModel.Model.WorkspaceOpened += WorkspaceOpened;
-        }
 
         #endregion
 
         #region Methods
 
-        private void OpenGraphs(object obj)
+        /// <summary>
+        ///     The main method executing the export
+        /// </summary>
+        /// <param name="obj"></param>
+        private void ExportGraphs(object obj)
         {
-            if (string.IsNullOrEmpty(SourcePathViewModel.FolderPath) || string.IsNullOrEmpty(TargetPathViewModel.FolderPath))
+            if (string.IsNullOrEmpty(SourcePathViewModel.FolderPath) ||
+                string.IsNullOrEmpty(TargetPathViewModel.FolderPath))
                 return;
 
-            var files = Utilities.Utilities.GetAllFilesOfExtension(SourcePathViewModel.FolderPath);
+            var files = Utilities.GetAllFilesOfExtension(SourcePathViewModel.FolderPath);
             if (files == null)
                 return;
 
@@ -224,8 +160,8 @@ namespace ExportSampleImagesViewExtension
 
                 DoEvents(); // Allows visual tree to be reconstructed.
 
-                // 2 Cleaunp Nodes
-                this.DynamoViewModel.GraphAutoLayoutCommand.Execute(null);
+                // 2 Cleanup Nodes
+                DynamoViewModel.GraphAutoLayoutCommand.Execute(null);
 
                 DoEvents();
 
@@ -242,125 +178,48 @@ namespace ExportSampleImagesViewExtension
             CleanUp();
         }
 
+
         private void ExportCombinedImages(string graphName)
         {
             var pathForeground = Path.Combine(TargetPathViewModel.FolderPath, graphName + "_f.png");
             var pathBackground = Path.Combine(TargetPathViewModel.FolderPath, graphName + "_b.png");
 
-            this.DynamoViewModel.Save3DImageCommand.Execute(pathBackground);
-            this.DynamoViewModel.SaveImageCommand.Execute(pathForeground);
+            DynamoViewModel.Save3DImageCommand.Execute(pathBackground);
+            DynamoViewModel.SaveImageCommand.Execute(pathForeground);
 
-            OverlayImages(graphName, pathBackground, pathForeground);
+            var finalImage = Utilities.OverlayImages(pathBackground, pathForeground);
+            Utilities.SaveBitmapToPng(finalImage, TargetPathViewModel.FolderPath, graphName);
 
             cleanupImageList.Add(pathForeground);
             cleanupImageList.Add(pathBackground);
         }
 
+
         private void CleanUp()
         {
             if (cleanupImageList == null || cleanupImageList.Count == 0) return;
 
-            foreach (var image in cleanupImageList)
-            {
-                File.Delete(image);
-            }
+            foreach (var image in cleanupImageList) File.Delete(image);
         }
 
-        private void OverlayImages(string name, string background, string foreground)
-        {
-            using (var baseImage = (Bitmap) Image.FromFile(background))
-            {
-                using (var overlayImage = (Bitmap) Image.FromFile(foreground))
-                {
-                    var resizedImage = Resize(baseImage, overlayImage);
-
-                    var finalImage = new Bitmap(baseImage.Width, baseImage.Height, PixelFormat.Format32bppArgb);
-
-                    GetCurrentDPI(out int dpiX, out var dpiY);
-
-                    finalImage.SetResolution(dpiX, dpiY);
-                    var graphics = Graphics.FromImage(finalImage);
-
-                    graphics.CompositingMode = CompositingMode.SourceOver;
-                    graphics.DrawImage(baseImage, 0, 0);
-                    graphics.DrawImage(resizedImage, 
-                        Convert.ToInt32((baseImage.Width - resizedImage.Width) * (float)0.5), 
-                        Convert.ToInt32((baseImage.Height - resizedImage.Height) * (float)0.5));    // Center the overlaid image
-                    
-                    //save the final composite image to disk
-                    finalImage.Save(Path.Combine(TargetPathViewModel.FolderPath, name + ".png"), ImageFormat.Png);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Retrieve the current system DPI settings
-        /// Uses reflection, does not need a Control
-        /// </summary>
-        private void GetCurrentDPI(out int dpiX, out int dpiY)
-        {
-            var dpiXProperty = typeof(SystemParameters).GetProperty("DpiX", BindingFlags.NonPublic | BindingFlags.Static);
-            var dpiYProperty = typeof(SystemParameters).GetProperty("Dpi", BindingFlags.NonPublic | BindingFlags.Static);
-
-            dpiX = (int)dpiXProperty.GetValue(null, null);
-            dpiY = (int)dpiYProperty.GetValue(null, null);
-        }
-
-        private Bitmap Resize(Bitmap sourceImg, Bitmap targetImg)
-        {
-            var scaleFactor = Math.Min(sourceImg.Width / (float)targetImg.Width, sourceImg.Height / (float)targetImg.Height);
-            var newWidth = (int)(targetImg.Width * scaleFactor);
-            var newHeight = (int)(targetImg.Height * scaleFactor);
-            var newImage = new Bitmap(newWidth, newHeight);
-            
-            using (var graphics = Graphics.FromImage(newImage))
-            {
-                graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                graphics.DrawImage(targetImg, new Rectangle( 0, 0, newWidth, newHeight));
-                return newImage;
-            }
-        }
-
-        // TODO: Try catch? How to capture if the opening was successful?
+        // TODO: Should we bubble errors to Dynamo?
         private void OpenDynamoGraph(string path)
         {
             try
             {
-                this.DynamoViewModel.OpenCommand.Execute(path);
+                DynamoViewModel.OpenCommand.Execute(path);
             }
-            catch (Exception) { }
-        }
-        
-        /// <summary>
-        /// Triggers when the graph view opens
-        /// </summary>
-        /// <param name="workspace"></param>
-        private void WorkspaceOpened(WorkspaceModel workspace)
-        {
-            var homespace = workspace as HomeWorkspaceModel;
-            homespace.
-
-            FileName += " Run completed?";
+            catch (Exception)
+            {
+            }
         }
 
-        #endregion
-
-        #region Closing
-        /// <summary>
-        /// Remove event handlers
-        /// </summary>
-        public void Dispose()
-        {
-            viewLoadedParamsInstance.CurrentWorkspaceChanged -= OnCurrentWorkspaceOpened;
-            SourcePathViewModel.PropertyChanged -= SourcePathPropertyChanged;
-        }
         #endregion
 
         #region Utility
+
         /// <summary>
-        /// Force the Dispatcher to empty it's queue
+        ///     Force the Dispatcher to empty it's queue
         /// </summary>
         [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.UnmanagedCode)]
         public static void DoEvents()
@@ -378,9 +237,10 @@ namespace ExportSampleImagesViewExtension
         /// <returns></returns>
         private static object ExitFrame(object frame)
         {
-            ((DispatcherFrame)frame).Continue = false;
+            ((DispatcherFrame) frame).Continue = false;
             return null;
         }
+
         #endregion
     }
 }

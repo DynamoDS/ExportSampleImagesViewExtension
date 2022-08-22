@@ -1,34 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 using System.Windows;
+using System.Windows.Forms;
 using Dynamo.Core;
 using Dynamo.UI;
 using Dynamo.UI.Commands;
-using DynamoUtilities;
 
-namespace ExportSampleImagesViewExtension.Controls
+namespace ExportSampleImages.Controls
 {
-    public enum PathType { Source, Target }
+    public enum PathType
+    {
+        Source,
+        Target
+    }
 
     public class PathViewModel : NotificationObject
     {
-        internal Window Owner { get; set; }
         private string folderPath;
 
+        public PathViewModel()
+        {
+            UpdatePathCommand = new DelegateCommand(UpdatePath);
+        }
+
+        internal Window Owner { get; set; }
+
         /// <summary>
-        /// The purpose of the folder path
+        ///     The purpose of the folder path
         /// </summary>
         public PathType Type { get; set; }
 
         /// <summary>
-        /// The selected path associated with this control
+        ///     The selected path associated with this control
         /// </summary>
         public string FolderPath
         {
-            get { return folderPath; }
+            get => folderPath;
             set
             {
                 if (value != folderPath)
@@ -41,30 +47,20 @@ namespace ExportSampleImagesViewExtension.Controls
 
 
         /// <summary>
-        /// Handles path update call
+        ///     Handles path update call
         /// </summary>
         public DelegateCommand UpdatePathCommand { get; set; }
-        
-        public PathViewModel()
-        {
-            UpdatePathCommand = new DelegateCommand(UpdatePath);  
-        }
 
         private void UpdatePath(object obj)
         {
-            string folder = FolderPath;
-            
+            var folder = FolderPath;
             var dialog = new DynamoFolderBrowserDialog
             {
-                SelectedPath = System.IO.Directory.Exists(folder) ? folder : string.Empty,
+                SelectedPath = Directory.Exists(folder) ? folder : string.Empty,
                 Owner = Window.GetWindow(Owner)
             };
 
-            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                folder = dialog.SelectedPath;
-            }
-
+            if (dialog.ShowDialog() == DialogResult.OK) folder = dialog.SelectedPath;
             if (string.IsNullOrEmpty(folder))
                 return;
 
