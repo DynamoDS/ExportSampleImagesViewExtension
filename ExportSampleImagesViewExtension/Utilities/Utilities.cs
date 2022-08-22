@@ -49,12 +49,12 @@ namespace ExportSampleImages
         /// <param name="sourceImg">The image to match the size to</param>
         /// <param name="targetImg">The image to be resized</param>
         /// <returns></returns>
-        public static Bitmap Resize(Bitmap sourceImg, Bitmap targetImg)
+        public static Bitmap Resize(Bitmap sourceImg, Bitmap targetImg, double scale = 1.0)
         {
             var scaleFactor = Math.Min(sourceImg.Width / (float) targetImg.Width,
                 sourceImg.Height / (float) targetImg.Height);
-            var newWidth = (int) (targetImg.Width * scaleFactor);
-            var newHeight = (int) (targetImg.Height * scaleFactor);
+            var newWidth = (int) (targetImg.Width * scaleFactor * scale);
+            var newHeight = (int) (targetImg.Height * scaleFactor * scale);
             var newImage = new Bitmap(newWidth, newHeight);
 
             using (var graphics = Graphics.FromImage(newImage))
@@ -85,7 +85,7 @@ namespace ExportSampleImages
         /// <param name="background"></param>
         /// <param name="foreground"></param>
         /// <returns></returns>
-        public static Bitmap OverlayImages(string background, string foreground)
+        public static Bitmap OverlayImages(string background, string foreground, double scale = 1.0)
         {
             Bitmap finalImage;
 
@@ -93,7 +93,7 @@ namespace ExportSampleImages
             {
                 using (var overlayImage = (Bitmap) Image.FromFile(foreground))
                 {
-                    var resizedImage = Resize(baseImage, overlayImage);
+                    var resizedImage = Resize(baseImage, overlayImage, scale);
 
                     finalImage = new Bitmap(baseImage.Width, baseImage.Height, PixelFormat.Format32bppArgb);
 

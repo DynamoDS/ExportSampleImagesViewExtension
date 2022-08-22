@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Security.Permissions;
 using System.Windows.Threading;
 using Dynamo.Core;
@@ -49,6 +50,8 @@ namespace ExportSampleImages
         {
             get
             {
+                if (SourcePathViewModel == null || TargetPathViewModel == null)
+                    return false;
                 return Utilities.AreValidPaths(SourcePathViewModel.FolderPath, TargetPathViewModel.FolderPath);
             }
             private set
@@ -119,10 +122,10 @@ namespace ExportSampleImages
             Graphs = new ObservableCollection<GraphViewModel>();
             graphDictionary = new Dictionary<string, GraphViewModel>();
 
-            var files = Utilities.GetAllFilesOfExtension(pathVM.FolderPath);
+            var files = Utilities.GetAllFilesOfExtension(pathVM.FolderPath)?.OrderBy(x => x);
             if (files == null)
                 return;
-
+            
             foreach (var graph in files)
             {
                 var name = Path.GetFileNameWithoutExtension(graph);
@@ -167,7 +170,7 @@ namespace ExportSampleImages
                 string.IsNullOrEmpty(TargetPathViewModel.FolderPath))
                 return;
 
-            var files = Utilities.GetAllFilesOfExtension(SourcePathViewModel.FolderPath);
+            var files = Utilities.GetAllFilesOfExtension(SourcePathViewModel.FolderPath)?.OrderBy(x => x);
             if (files == null)
                 return;
 
@@ -178,7 +181,7 @@ namespace ExportSampleImages
 
                 DoEvents(); // Allows visual tree to be reconstructed.
 
-                // 2 Cleanup Nodes
+                // 2 Auto Layout Nodes
                 DynamoViewModel.GraphAutoLayoutCommand.Execute(null);
 
                 DoEvents();
@@ -205,7 +208,7 @@ namespace ExportSampleImages
             DynamoViewModel.Save3DImageCommand.Execute(pathBackground);
             DynamoViewModel.SaveImageCommand.Execute(pathForeground);
 
-            var finalImage = Utilities.OverlayImages(pathBackground, pathForeground);
+            var finalImage = Utilities.OverlayImages(pathBackground, pathForeground, 0.9);
             Utilities.SaveBitmapToPng(finalImage, TargetPathViewModel.FolderPath, graphName);
 
             cleanupImageList.Add(pathForeground);
