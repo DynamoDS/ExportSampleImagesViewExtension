@@ -64,6 +64,27 @@ namespace ExportSampleImages
             }
         }
 
+        private string notificationMessage;
+        /// <summary>
+        ///     Contains notification text displayed on the UI
+        /// </summary>
+        public string NotificationMessage
+        {
+            get
+            {
+                return notificationMessage;
+            }
+
+            set
+            {
+                if (notificationMessage != value)
+                {
+                    notificationMessage = value;
+                    RaisePropertyChanged(nameof(notificationMessage));
+                }
+            }
+        }
+
         public DelegateCommand ExportGraphsCommand { get; set; }
 
         #endregion
@@ -135,6 +156,7 @@ namespace ExportSampleImages
                 graphDictionary[name] = graphVM;
             }
 
+            NotificationMessage = String.Format(Properties.Resources.NotificationMsg, Graphs.Count.ToString());
             RaisePropertyChanged(nameof(Graphs));
         }
 
@@ -174,8 +196,11 @@ namespace ExportSampleImages
             if (files == null)
                 return;
 
-            foreach (var file in files)
+            foreach (var (file, index) in files.Select((file, index) => (file, index)))
             {
+
+                NotificationMessage = String.Format(Properties.Resources.ProcessMsg, (index+1).ToString(), files.Count().ToString());
+
                 // 1 Open a graph
                 OpenDynamoGraph(file);
 

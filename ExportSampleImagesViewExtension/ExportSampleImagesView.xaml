@@ -49,6 +49,12 @@
 
         <!-- Export button -->
         <DockPanel HorizontalAlignment="Stretch" Grid.Row="1" Margin="0 10 0 20">
+            <TextBlock x:Name="MessageTextBlock"
+                       Text="{Binding NotificationMessage}"
+                       DockPanel.Dock="Left"
+                       Padding="5 5 0 0"
+                       VerticalAlignment="Center"
+                       Foreground="{StaticResource PreferencesWindowFontColor}"/>
             <Button Content="{x:Static p:Resources.ExportButtonText}"
                     Margin="0 0 -3 0"
                     Command="{Binding ExportGraphsCommand}"

@@ -107,6 +107,24 @@ namespace ExportSampleImages.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The target folder contains {0} Dynamo graphs..
+        /// </summary>
+        public static string NotificationMsg {
+            get {
+                return ResourceManager.GetString("NotificationMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Processed {0} out of {1} graphs..
+        /// </summary>
+        public static string ProcessMsg {
+            get {
+                return ResourceManager.GetString("ProcessMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap Progress_circle {
