@@ -8,10 +8,12 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Permissions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using Dynamo.Controls;
@@ -273,11 +275,13 @@ namespace ExportSampleImagesViewExtension
                     var resizedImage = Resize(baseImage, overlayImage);
 
                     var finalImage = new Bitmap(baseImage.Width, baseImage.Height, PixelFormat.Format32bppArgb);
-                    finalImage.SetResolution(120, 120);
+
+                    GetCurrentDPI(out int dpiX, out var dpiY);
+
+                    finalImage.SetResolution(dpiX, dpiY);
                     var graphics = Graphics.FromImage(finalImage);
 
                     graphics.CompositingMode = CompositingMode.SourceOver;
-
                     graphics.DrawImage(baseImage, 0, 0);
                     graphics.DrawImage(resizedImage, 
                         Convert.ToInt32((baseImage.Width - resizedImage.Width) * (float)0.5), 
@@ -287,6 +291,19 @@ namespace ExportSampleImagesViewExtension
                     finalImage.Save(Path.Combine(TargetPathViewModel.FolderPath, name + ".png"), ImageFormat.Png);
                 }
             }
+        }
+
+        /// <summary>
+        /// Retrieve the current system DPI settings
+        /// Uses reflection, does not need a Control
+        /// </summary>
+        private void GetCurrentDPI(out int dpiX, out int dpiY)
+        {
+            var dpiXProperty = typeof(SystemParameters).GetProperty("DpiX", BindingFlags.NonPublic | BindingFlags.Static);
+            var dpiYProperty = typeof(SystemParameters).GetProperty("Dpi", BindingFlags.NonPublic | BindingFlags.Static);
+
+            dpiX = (int)dpiXProperty.GetValue(null, null);
+            dpiY = (int)dpiYProperty.GetValue(null, null);
         }
 
         private Bitmap Resize(Bitmap sourceImg, Bitmap targetImg)

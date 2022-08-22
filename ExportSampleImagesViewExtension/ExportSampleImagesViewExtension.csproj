@@ -226,8 +226,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="images\Checkmark - menu selected.png" />
     <Resource Include="images\Progress circle.png" />
+    <Resource Include="images\checkmark.png" />
     <Content Include="manifest\ExportSampleImagesViewExtension_ViewExtensionDefinition.xml" />
     <Content Include="images\logo.png" />
     <Content Include="license.txt" />

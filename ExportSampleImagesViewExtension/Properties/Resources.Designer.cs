@@ -63,9 +63,9 @@ namespace ExportSampleImagesViewExtension.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        public static System.Drawing.Bitmap Checkmark___menu_selected {
+        public static System.Drawing.Bitmap checkmark {
             get {
-                object obj = ResourceManager.GetObject("Checkmark___menu_selected", resourceCulture);
+                object obj = ResourceManager.GetObject("checkmark", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

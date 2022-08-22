@@ -41,7 +41,7 @@ namespace ExportSampleImagesViewExtension.Controls
             bool condition = (bool)value;
             if (condition)
             {
-                return ResourceUtilities.ConvertToImageSource(Properties.Resources.Checkmark___menu_selected);
+                return ResourceUtilities.ConvertToImageSource(Properties.Resources.checkmark);
             }
 
             return ResourceUtilities.ConvertToImageSource(Properties.Resources.Progress_circle);
