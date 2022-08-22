@@ -41,6 +41,26 @@ namespace ExportSampleImages
         /// </summary>
         public PathViewModel TargetPathViewModel { get; set; }
 
+        private bool canExport;
+        /// <summary>
+        ///     Checks if both folder paths have been set
+        /// </summary>
+        public bool CanExport
+        {
+            get
+            {
+                return Utilities.AreValidPaths(SourcePathViewModel.FolderPath, TargetPathViewModel.FolderPath);
+            }
+            private set
+            {
+                if (canExport != value)
+                {
+                    canExport = value;
+                    RaisePropertyChanged(nameof(CanExport));
+                }
+            }
+        }
+
         public DelegateCommand ExportGraphsCommand { get; set; }
 
         #endregion
@@ -71,6 +91,7 @@ namespace ExportSampleImages
             SourcePathViewModel = new PathViewModel
                 {Type = PathType.Source, Owner = viewLoadedParamsInstance.DynamoWindow};
 
+            TargetPathViewModel.PropertyChanged += SourcePathPropertyChanged;
             SourcePathViewModel.PropertyChanged += SourcePathPropertyChanged;
 
             ExportGraphsCommand = new DelegateCommand(ExportGraphs);
@@ -80,8 +101,16 @@ namespace ExportSampleImages
         private void SourcePathPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
         {
             var pathVM = sender as PathViewModel;
-            if (pathVM == null || pathVM.Type != PathType.Source) return;
-            if (propertyChangedEventArgs.PropertyName == nameof(PathViewModel.FolderPath)) SourceFolderChanged(pathVM);
+            if (pathVM == null) return;
+            if (propertyChangedEventArgs.PropertyName == nameof(PathViewModel.FolderPath))
+            {
+                if (pathVM.Type == PathType.Source)
+                {
+                    SourceFolderChanged(pathVM);
+                }
+
+                RaisePropertyChanged(nameof(CanExport));
+            }
         }
 
         // Update graphs if source folder is changed by the UI
@@ -212,6 +241,7 @@ namespace ExportSampleImages
         /// </summary>
         public void Dispose()
         {
+            TargetPathViewModel.PropertyChanged -= SourcePathPropertyChanged;
             SourcePathViewModel.PropertyChanged -= SourcePathPropertyChanged;
         }
 

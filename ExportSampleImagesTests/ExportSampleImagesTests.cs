@@ -16,10 +16,7 @@ namespace ExportSampleImagesTests
     {
         protected override void GetLibrariesToPreload(List<string> libraries)
         {
-            libraries.Add("ProtoGeometry.dll");
-            libraries.Add("DSCoreNodes.dll");
-            libraries.Add("GeometryColor.dll");
-            libraries.Add("VMDataBridge.dll");
+          
             base.GetLibrariesToPreload(libraries);
         }
 
@@ -39,6 +36,8 @@ namespace ExportSampleImagesTests
 
             // Get ESIViewExtension
             var esiVE = GetExportSampleImagesViewExtension();
+
+            Assert.AreEqual("carrot", "carrot");
 
         }
     }

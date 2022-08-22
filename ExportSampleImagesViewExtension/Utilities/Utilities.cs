@@ -30,18 +30,15 @@ namespace ExportSampleImages
             return files;
         }
 
-        public static string GetFolder()
+        /// <summary>
+        /// Returns true if both paths exist
+        /// </summary>
+        /// <param name="path1"></param>
+        /// <param name="path2"></param>
+        /// <returns></returns>
+        public static bool AreValidPaths(string path1, string path2)
         {
-            var folder = "";
-
-            using (var fbd = new FolderBrowserDialog())
-            {
-                var result = fbd.ShowDialog();
-
-                if (result == DialogResult.OK && !string.IsNullOrEmpty(fbd.SelectedPath)) folder = fbd.SelectedPath;
-            }
-
-            return folder;
+            return Directory.Exists(path1) && Directory.Exists(path2);
         }
 
 

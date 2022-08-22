@@ -52,6 +52,7 @@
             <Button Content="{x:Static p:Resources.ExportButtonText}"
                     Margin="0 0 -3 0"
                     Command="{Binding OpenGraphsCommand}"
+                    IsEnabled="{Binding CanExport}"
                     DockPanel.Dock="Right"
                     HorizontalAlignment="Right"
                     Background="White"
