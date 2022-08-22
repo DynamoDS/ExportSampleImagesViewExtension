@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:ui="clr-namespace:Dynamo.UI;assembly=DynamoCoreWpf"
              xmlns:controls="clr-namespace:ExportSampleImages.Controls"
+             xmlns:p="clr-namespace:ExportSampleImages.Properties"
              UseLayoutRounding="True"
              SnapsToDevicePixels="True"
              mc:Ignorable="d"
@@ -32,13 +33,13 @@
 
         <!-- Folder selection controls -->
         <StackPanel Orientation="Vertical">
-            <Label Content="Source folder"
+            <Label Content="{x:Static p:Resources.SourceFolderMsg}"
                    Padding="5,5,5,5"
                    FontSize="13"
                    FontFamily="{StaticResource ArtifaktElementBold}"
                    Foreground="{StaticResource PreferencesWindowFontColor}" />
             <controls:FolderPathViewControl DataContext="{Binding SourcePathViewModel}" Margin="0 0 0 10" />
-            <Label Content="Target folder"
+            <Label Content="{x:Static p:Resources.TargetFolderMsg}"
                    Padding="5,5,5,5"
                    FontSize="13"
                    FontFamily="{StaticResource ArtifaktElementBold}"
@@ -48,7 +49,7 @@
 
         <!-- Export button -->
         <DockPanel HorizontalAlignment="Stretch" Grid.Row="1" Margin="0 10 0 20">
-            <Button Content="Export"
+            <Button Content="{x:Static p:Resources.ExportButtonText}"
                     Margin="0 0 -3 0"
                     Command="{Binding OpenGraphsCommand}"
                     DockPanel.Dock="Right"
@@ -67,7 +68,7 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <Label Content="Graphs to export"
+            <Label Content="{x:Static p:Resources.ExportGraphMsg}"
                    Padding="5,5,5,5"
                    FontSize="13"
                    FontFamily="{StaticResource ArtifaktElementBold}"

@@ -71,12 +71,84 @@ namespace ExportSampleImages.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Export.
+        /// </summary>
+        public static string ExportButtonText {
+            get {
+                return ResourceManager.GetString("ExportButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Graph to export.
+        /// </summary>
+        public static string ExportGraphMsg {
+            get {
+                return ResourceManager.GetString("ExportGraphMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export Sample Images.
+        /// </summary>
+        public static string ExtensionName {
+            get {
+                return ResourceManager.GetString("ExtensionName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Show Export Sample Images.
+        /// </summary>
+        public static string HeaderText {
+            get {
+                return ResourceManager.GetString("HeaderText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap Progress_circle {
             get {
                 object obj = ResourceManager.GetObject("Progress_circle", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select folder ...
+        /// </summary>
+        public static string SelectFolderMsg {
+            get {
+                return ResourceManager.GetString("SelectFolderMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Source folder.
+        /// </summary>
+        public static string SourceFolderMsg {
+            get {
+                return ResourceManager.GetString("SourceFolderMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Target folder.
+        /// </summary>
+        public static string TargetFolderMsg {
+            get {
+                return ResourceManager.GetString("TargetFolderMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select folder..
+        /// </summary>
+        public static string UpdatePathTooltip {
+            get {
+                return ResourceManager.GetString("UpdatePathTooltip", resourceCulture);
             }
         }
     }

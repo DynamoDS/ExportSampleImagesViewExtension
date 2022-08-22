@@ -15,29 +15,6 @@ namespace ExportSampleImages
 {
     public static class Utilities
     {
-        /// <summary>
-        ///     Returns a folder path
-        ///     Source:
-        ///     https://stackoverflow.com/questions/8142109/how-can-i-make-commonopenfiledialog-select-folders-only-but-still-show-files/20102239#20102239
-        /// </summary>
-        /// <returns></returns>
-        public static string GetFolderDialog()
-        {
-            var openFolder = new CommonOpenFileDialog();
-
-            openFolder.AllowNonFileSystemItems = true;
-            openFolder.Multiselect = true;
-            openFolder.IsFolderPicker = true;
-            openFolder.Title = "Select destination folder.";
-
-            if (openFolder.ShowDialog() != CommonFileDialogResult.Ok)
-            {
-                MessageBox.Show("No Folder selected");
-                return null;
-            }
-
-            return openFolder.FileName;
-        }
 
         /// <summary>
         ///     Returns a list of files of given path and extension

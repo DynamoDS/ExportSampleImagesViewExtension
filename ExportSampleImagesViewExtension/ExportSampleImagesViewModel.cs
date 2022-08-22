@@ -17,17 +17,6 @@ namespace ExportSampleImages
 {
     public class ExportSampleImagesViewModel : NotificationObject, IDisposable
     {
-        #region Closing
-
-        /// <summary>
-        ///     Remove event handlers
-        /// </summary>
-        public void Dispose()
-        {
-            SourcePathViewModel.PropertyChanged -= SourcePathPropertyChanged;
-        }
-
-        #endregion
 
         #region Fields and Properties
 
@@ -212,6 +201,18 @@ namespace ExportSampleImages
             catch (Exception)
             {
             }
+        }
+
+        #endregion
+
+        #region Closing
+
+        /// <summary>
+        ///     Remove event handlers
+        /// </summary>
+        public void Dispose()
+        {
+            SourcePathViewModel.PropertyChanged -= SourcePathPropertyChanged;
         }
 
         #endregion

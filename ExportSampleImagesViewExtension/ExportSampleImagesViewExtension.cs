@@ -9,9 +9,9 @@ namespace ExportSampleImages
     public class ExportSampleImagesViewExtension : ViewExtensionBase, IViewExtension
     {
         private MenuItem exportSampleImagesMenuItem;
+        private ViewLoadedParams viewLoadedParamsReference;
 
         internal ExportSampleImagesView View;
-        private ViewLoadedParams viewLoadedParamsReference;
         internal ExportSampleImagesViewModel ViewModel;
 
         public ExportSampleImagesViewExtension()
@@ -22,8 +22,7 @@ namespace ExportSampleImages
         /// <summary>
         ///     Extension Name
         /// </summary>
-        //public override string Name => Properties.Resources.ExtensionName;
-        public override string Name => "Export Sample Images";
+        public override string Name => Properties.Resources.ExtensionName;
 
         /// <summary>
         ///     GUID of the extension
@@ -51,7 +50,7 @@ namespace ExportSampleImages
             viewLoadedParamsReference = viewLoadedParams;
 
             // Add a button to Dynamo View menu to manually show the window
-            exportSampleImagesMenuItem = new MenuItem {Header = "Show Export Sample Images", IsCheckable = true};
+            exportSampleImagesMenuItem = new MenuItem {Header = Properties.Resources.HeaderText, IsCheckable = true};
             exportSampleImagesMenuItem.Checked += MenuItemCheckHandler;
             exportSampleImagesMenuItem.Unchecked += MenuItemUnCheckHandler;
 

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:ExportSampleImages.Controls"
              xmlns:ui="clr-namespace:Dynamo.UI;assembly=DynamoCoreWpf"
+             xmlns:p="clr-namespace:ExportSampleImages.Properties"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance local:PathViewModel, IsDesignTimeCreatable=False}">
 
@@ -42,7 +43,7 @@
         <TextBlock x:Name="PlaceholderTextBlock"
                    Style="{StaticResource DarkTextBlock}"
                    Visibility="{Binding FolderPath, Converter={StaticResource NonEmptyStringToCollapsedConverter}}"
-                   Text="Select folder .."
+                   Text="{x:Static p:Resources.SelectFolderMsg}"
                    FontSize="10"
                    Grid.Column="0"
                    Margin="5"
@@ -62,7 +63,7 @@
                 Background="{StaticResource PreferencesWindowBackgroundColor}"
                 Style="{StaticResource EditFolderButtonStyle}">
             <Button.ToolTip>
-                <ToolTip Content="Select folder." Style="{StaticResource GenericToolTipLight}" />
+                <ToolTip Content="{x:Static p:Resources.UpdatePathTooltip}" Style="{StaticResource GenericToolTipLight}" />
             </Button.ToolTip>
         </Button>
     </Grid>
