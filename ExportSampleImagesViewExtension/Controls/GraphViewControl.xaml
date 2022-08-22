@@ -8,21 +8,22 @@
              mc:Ignorable="d" 
              d:DesignHeight="40" d:DesignWidth="800">
     <UserControl.Resources>
-        <controls:BooleanToBrushConverter
-            x:Key="BooleanToBrushConverter"
-            FalseBrush="#252525"
-            TrueBrush="#6AC0E7" />
+        <local:BooleanToImageSourceConverter x:Key="BooleanToImageSourceConverter"/>
     </UserControl.Resources>
     <Grid Margin="0 5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"></ColumnDefinition>
             <ColumnDefinition Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Ellipse 
-            Width="6" 
-            Height="6" 
-            Fill="{Binding Exported, Converter={StaticResource BooleanToBrushConverter}}" 
-            Margin="0"></Ellipse>
+
+        <!-- Progress icon -->
+        <Image 
+            Width="12" 
+            Height="12" 
+            Source="{Binding Exported, Converter={StaticResource BooleanToImageSourceConverter}}"
+            Margin="0"/>
+
+        <!-- Graph name -->
         <TextBlock 
             Grid.Column="1" 
             Text="{Binding GraphName}" 

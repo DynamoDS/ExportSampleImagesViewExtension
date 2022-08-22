@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics.Eventing.Reader;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Permissions;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using Dynamo.Controls;
@@ -24,6 +27,7 @@ using Dynamo.Views;
 using Dynamo.Wpf.Extensions;
 using ExportSampleImagesViewExtension.Controls;
 using PathType = ExportSampleImagesViewExtension.Controls.PathType;
+using Point = System.Windows.Point;
 
 namespace ExportSampleImagesViewExtension
 {
@@ -43,6 +47,8 @@ namespace ExportSampleImagesViewExtension
         private string sourcePath;
         private string targetPath;
         private string fileName;
+
+        private List<string> cleanupImageList = new List<string>();
 
         public string SourcePath
         {
@@ -225,12 +231,95 @@ namespace ExportSampleImagesViewExtension
 
                 // 3 Save an image
                 var graphName = Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName);
-                var path = Path.Combine(TargetPathViewModel.FolderPath, graphName + ".png");
-
-                this.DynamoViewModel.SaveImageCommand.Execute(path);
+                ExportCombinedImages(graphName);
 
                 // 4 Update the UI
                 graphDictionary[graphName].Exported = true;
+
+                DoEvents();
+            }
+
+            CleanUp();
+        }
+
+        private void ExportCombinedImages(string graphName)
+        {
+            var pathForeground = Path.Combine(TargetPathViewModel.FolderPath, graphName + "_f.png");
+            var pathBackground = Path.Combine(TargetPathViewModel.FolderPath, graphName + "_b.png");
+
+            this.DynamoViewModel.Save3DImageCommand.Execute(pathBackground);
+            this.DynamoViewModel.SaveImageCommand.Execute(pathForeground);
+
+            OverlayImages(graphName, pathBackground, pathForeground);
+
+            cleanupImageList.Add(pathForeground);
+            cleanupImageList.Add(pathBackground);
+        }
+
+        private void CleanUp()
+        {
+            if (cleanupImageList == null || cleanupImageList.Count == 0) return;
+
+            foreach (var image in cleanupImageList)
+            {
+                File.Delete(image);
+            }
+        }
+
+        private void OverlayImages(string name, string background, string foreground)
+        {
+            using (var baseImage = (Bitmap) Image.FromFile(background))
+            {
+                using (var overlayImage = (Bitmap) Image.FromFile(foreground))
+                {
+                    var resizedImage = Resize(baseImage, overlayImage);
+
+                    var finalImage = new Bitmap(baseImage.Width, baseImage.Height, PixelFormat.Format32bppArgb);
+
+                    GetCurrentDPI(out int dpiX, out var dpiY);
+
+                    finalImage.SetResolution(dpiX, dpiY);
+                    var graphics = Graphics.FromImage(finalImage);
+
+                    graphics.CompositingMode = CompositingMode.SourceOver;
+                    graphics.DrawImage(baseImage, 0, 0);
+                    graphics.DrawImage(resizedImage, 
+                        Convert.ToInt32((baseImage.Width - resizedImage.Width) * (float)0.5), 
+                        Convert.ToInt32((baseImage.Height - resizedImage.Height) * (float)0.5));    // Center the overlaid image
+                    
+                    //save the final composite image to disk
+                    finalImage.Save(Path.Combine(TargetPathViewModel.FolderPath, name + ".png"), ImageFormat.Png);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Retrieve the current system DPI settings
+        /// Uses reflection, does not need a Control
+        /// </summary>
+        private void GetCurrentDPI(out int dpiX, out int dpiY)
+        {
+            var dpiXProperty = typeof(SystemParameters).GetProperty("DpiX", BindingFlags.NonPublic | BindingFlags.Static);
+            var dpiYProperty = typeof(SystemParameters).GetProperty("Dpi", BindingFlags.NonPublic | BindingFlags.Static);
+
+            dpiX = (int)dpiXProperty.GetValue(null, null);
+            dpiY = (int)dpiYProperty.GetValue(null, null);
+        }
+
+        private Bitmap Resize(Bitmap sourceImg, Bitmap targetImg)
+        {
+            var scaleFactor = Math.Min(sourceImg.Width / (float)targetImg.Width, sourceImg.Height / (float)targetImg.Height);
+            var newWidth = (int)(targetImg.Width * scaleFactor);
+            var newHeight = (int)(targetImg.Height * scaleFactor);
+            var newImage = new Bitmap(newWidth, newHeight);
+            
+            using (var graphics = Graphics.FromImage(newImage))
+            {
+                graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                graphics.DrawImage(targetImg, new Rectangle( 0, 0, newWidth, newHeight));
+                return newImage;
             }
         }
 

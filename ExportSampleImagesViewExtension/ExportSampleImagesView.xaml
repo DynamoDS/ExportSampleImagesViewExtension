@@ -23,32 +23,59 @@
 
     <Grid x:Name="MainGrid" Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
 
+        <!-- Folder selection controls -->
         <StackPanel Orientation="Vertical">
+            <Label Content="Source folder"     
+                   Padding="5,5,5,5"
+                   FontSize="13"
+                   FontFamily="{StaticResource ArtifaktElementBold}"
+                   Foreground="{StaticResource PreferencesWindowFontColor}"></Label>
+            <controls:FolderPathViewControl DataContext="{Binding SourcePathViewModel}" Margin="0 0 0 10"/>
+            <Label Content="Target folder" 
+                   Padding="5,5,5,5"
+                   FontSize="13"
+                   FontFamily="{StaticResource ArtifaktElementBold}"
+                   Foreground="{StaticResource PreferencesWindowFontColor}"></Label>
+            <controls:FolderPathViewControl DataContext="{Binding TargetPathViewModel}" Margin="0 0 0 10"/>
+        </StackPanel>
 
-            <StackPanel>
-                <Label Content="Source folder"     
-                       Padding="5,5,5,5"
-                       FontSize="13"
-                       FontFamily="{StaticResource ArtifaktElementBold}"
-                       Foreground="{StaticResource PreferencesWindowFontColor}"></Label>
-                <controls:FolderPathViewControl DataContext="{Binding SourcePathViewModel}" Margin="0 0 0 10"/>
-                <Label Content="Target folder" 
-                       Padding="5,5,5,5"
-                       FontSize="13"
-                       FontFamily="{StaticResource ArtifaktElementBold}"
-                       Foreground="{StaticResource PreferencesWindowFontColor}"></Label>
-                <controls:FolderPathViewControl DataContext="{Binding TargetPathViewModel}" Margin="0 0 0 10"/>
-            </StackPanel>
+        <!-- Export button -->
+        <DockPanel HorizontalAlignment="Stretch" Grid.Row="1" Margin="0 10 0 20">
+            <Button Content="Export"
+                    Margin="0 0 -3 0"
+                    Command="{Binding OpenGraphsCommand}"
+                    DockPanel.Dock="Right"
+                    HorizontalAlignment="Right"
+                    Background="White"
+                    BorderBrush="#BFBFBF"
+                    Foreground="#3C3C3C"
+                    Style="{StaticResource CtaButtonStyle}"/>
+        </DockPanel>
 
-            <Separator Margin="-25 10"></Separator>
+        <Separator Margin="-25 0" Grid.Row="2" VerticalAlignment="Top" Background="{StaticResource DarkGreyBrush}"></Separator>
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <!-- Graphs to be exported -->
+        <Grid Grid.Row="2" Margin="0 15 0 0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <Label Content="Graphs to export" 
+                   Padding="5,5,5,5"
+                   FontSize="13"
+                   FontFamily="{StaticResource ArtifaktElementBold}"
+                   Foreground="{StaticResource PreferencesWindowFontColor}"></Label>
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto" 
+                          Grid.Row="1"
+                          MaxHeight="450" Margin="1 5 -4 5">
                 <ItemsControl x:Name="GraphsItemsControl" 
-                              Margin="0 5"
+                              Margin="5"
                               ItemsSource="{Binding Graphs, UpdateSourceTrigger=PropertyChanged}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -62,18 +89,7 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </ScrollViewer>
-        </StackPanel>
+        </Grid>
 
-        <DockPanel HorizontalAlignment="Stretch" Grid.Row="1">
-            <Button Content="Run"
-                    Margin="5 0"
-                    Command="{Binding OpenGraphsCommand}"
-                    DockPanel.Dock="Right"
-                    HorizontalAlignment="Right"
-                    Background="White"
-                    BorderBrush="#BFBFBF"
-                    Foreground="#3C3C3C"
-                    Style="{StaticResource SolidButtonStyleSmaller}"/>
-        </DockPanel> 
     </Grid>
 </UserControl>
