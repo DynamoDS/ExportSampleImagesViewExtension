@@ -13,4 +13,7 @@ The extension supports multiple graphs and sports a basic, although informative 
 - .Net Framework 4.8
 
 ### Build Process
-- After 
+- For or download the repository
+- ```Build``` the soluition 
+- Open the ```ExportSampleImages_ViewExtensionDefinition.xml``` and change the path to the ```ExportSampleImagesViewExtension.dll``` by providing the correct path inside the ```<AssemblyPath></AssemblyPath> tags (the file should be in the ```bin\Debug``` of your solution) 
+- Copy the ```ExportSampleImages_ViewExtensionDefinition.xml``` file from the manifest directory to the ```viewExtensions``` folder of Dynamo (this can be under the ```bin\Debug``` folder if you are working in Sandbox environment, or the ```C:\Program Files\Autodesk\Revit 202x\AddIns\DynamoForRevit\viewExtensions``` for Dynamo Revit)
