@@ -1,4 +1,6 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Diagnostics;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace ExportSampleImages.Controls
@@ -13,15 +15,19 @@ namespace ExportSampleImages.Controls
             InitializeComponent();
         }
 
-        private void PlaceholderTextBlock_OnPreviewKeyDown(object sender, KeyEventArgs e)
+        private void PathTextBlock_OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
-                this.Cursor = Cursors.Hand;
-        }
+            var textBlock = (TextBlock) sender;
+            if (textBlock == null || string.IsNullOrEmpty(textBlock.Text)) return;
 
-        private void PlaceholderTextBlock_OnPreviewKeyUp(object sender, KeyEventArgs e)
-        {
-            this.Cursor = null;
+            try
+            {
+                Process.Start(textBlock.Text);
+            }
+            catch (Exception)
+            {
+                // ignored
+            }
         }
     }
 }

@@ -37,6 +37,8 @@
                    MinHeight="24"
                    Padding="8 6 4 4"
                    ToolTip="{Binding FolderPath}"
+                   Cursor="Hand"
+                   MouseLeftButtonUp="PathTextBlock_OnMouseLeftButtonUp"
                    Foreground="{StaticResource PreferencesWindowFontColor}" />
         <TextBlock x:Name="PlaceholderTextBlock"
                    Style="{StaticResource DarkTextBlock}"

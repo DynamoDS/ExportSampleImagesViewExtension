@@ -76,13 +76,14 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Label Content="{x:Static p:Resources.ExportGraphMsg}"
-                   Padding="5,5,5,5"
+                   Padding="5"
                    FontSize="13"
                    FontFamily="{StaticResource ArtifaktElementBold}"
                    Foreground="{StaticResource PreferencesWindowFontColor}" />
 
             <ScrollViewer VerticalScrollBarVisibility="Auto"
                           Grid.Row="1"
+                          VerticalAlignment="Top"
                           MaxHeight="450" Margin="1 5 -4 5">
                 <ItemsControl x:Name="GraphsItemsControl"
                               Margin="5"

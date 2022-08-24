@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Security.Permissions;
+using System.Windows;
 using System.Windows.Threading;
 using Dynamo.Core;
 using Dynamo.Graph.Workspaces;
@@ -12,6 +13,7 @@ using Dynamo.Models;
 using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
+using Dynamo.Wpf.Utilities;
 using ExportSampleImages.Controls;
 
 namespace ExportSampleImages
@@ -222,6 +224,16 @@ namespace ExportSampleImages
             }
 
             CleanUp();
+
+            InformFinish(files.Count().ToString());
+        }
+
+        private void InformFinish(string count)
+        {
+            var successMessage = String.Format(Properties.Resources.FinishMsg, count);
+            var owner = Window.GetWindow(viewLoadedParamsInstance.DynamoWindow);
+
+            MessageBoxService.Show(owner, successMessage, Properties.Resources.FinishMsgTitle, MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
 

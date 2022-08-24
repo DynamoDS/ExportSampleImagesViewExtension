@@ -130,6 +130,12 @@
   <data name="ExtensionName" xml:space="preserve">
     <value>Export Sample Images</value>
   </data>
+  <data name="FinishMsg" xml:space="preserve">
+    <value>Successfully exported {0} images!</value>
+  </data>
+  <data name="FinishMsgTitle" xml:space="preserve">
+    <value>Export finished.</value>
+  </data>
   <data name="HeaderText" xml:space="preserve">
     <value>Show Export Sample Images</value>
   </data>

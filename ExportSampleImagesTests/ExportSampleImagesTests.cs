@@ -81,6 +81,8 @@ namespace ExportSampleImagesTests
             DeleteFilesInFolder(imagesDir);
         }
 
+
+
         private void DeleteFilesInFolder(string folder)
         {
             System.IO.DirectoryInfo di = new DirectoryInfo(folder);

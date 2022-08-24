@@ -98,6 +98,24 @@ namespace ExportSampleImages.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Successfully exported {0} images!.
+        /// </summary>
+        public static string FinishMsg {
+            get {
+                return ResourceManager.GetString("FinishMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export finished..
+        /// </summary>
+        public static string FinishMsgTitle {
+            get {
+                return ResourceManager.GetString("FinishMsgTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Show Export Sample Images.
         /// </summary>
         public static string HeaderText {
