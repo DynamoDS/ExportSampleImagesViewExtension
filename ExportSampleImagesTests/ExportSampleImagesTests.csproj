@@ -47,13 +47,17 @@
       <HintPath>..\packages\DynamoVisualProgramming.Core.2.15.0.5383\lib\net48\DynamoApplications.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="DynamoCore, Version=2.15.0.5383, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\DynamoVisualProgramming.Core.2.15.0.5383\lib\net48\DynamoCore.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="DynamoCore, Version=2.16.0.1640, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Dynamo\bin\AnyCPU\Debug\DynamoCore.dll</HintPath>
     </Reference>
     <Reference Include="DynamoCoreTests, Version=2.15.0.5383, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\DynamoVisualProgramming.Tests.2.15.0.5383\lib\net48\DynamoCoreTests.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="DynamoCoreWpf, Version=2.16.0.1640, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Dynamo\bin\AnyCPU\Debug\DynamoCoreWpf.dll</HintPath>
     </Reference>
     <Reference Include="DynamoCoreWpfTests">
       <HintPath>..\..\..\Dynamo\bin\AnyCPU\Debug\DynamoCoreWpfTests.dll</HintPath>
@@ -166,6 +170,7 @@
       <HintPath>..\packages\DynamoVisualProgramming.Core.2.15.0.5383\lib\net48\VMDataBridge.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExportSampleImagesTests.cs" />

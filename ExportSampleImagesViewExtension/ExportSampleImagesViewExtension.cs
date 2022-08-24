@@ -8,7 +8,7 @@ namespace ExportSampleImages
 {
     public class ExportSampleImagesViewExtension : ViewExtensionBase, IViewExtension
     {
-        private MenuItem exportSampleImagesMenuItem;
+        public MenuItem exportSampleImagesMenuItem;
         private ViewLoadedParams viewLoadedParamsReference;
 
         internal ExportSampleImagesView View;

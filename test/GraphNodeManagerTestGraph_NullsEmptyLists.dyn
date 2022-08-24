@@ -1,0 +1,166 @@
+{
+  "Uuid": "c51cd97d-4453-4762-9257-6d6c3830f43c",
+  "IsCustomNode": false,
+  "Description": "",
+  "Name": "GraphNodeManagerTestGraph_NullsEmptyLists",
+  "ElementResolver": {
+    "ResolutionMap": {}
+  },
+  "Inputs": [],
+  "Outputs": [],
+  "Nodes": [
+    {
+      "ConcreteType": "Dynamo.Graph.Nodes.CodeBlockNodeModel, DynamoCore",
+      "NodeType": "CodeBlockNode",
+      "Code": "listWithNull = [1,2,\"hi\",null];\nlistWithEmpty = [[],2,3,[],\"bye\"];\nlistWithBoth = [1,2,null,4,\"five\",[],null];\nmestedListsWithBoth = [\n\t[\n\t\tnull,1,2\n\t],\n\t[\n\t\t\"string\",2,3\n\t],\n\t[\n\t\t12,\"hi\",\"bye\",\n\t\t\t[\n\t\t\t\t1,2,null,[]\n\t\t\t]\n\t]\n];",
+      "Id": "401b0f8d86534375b25e3aee1f7a1e8b",
+      "Inputs": [],
+      "Outputs": [
+        {
+          "Id": "a5e929fe0220469ba39df990cae4a5ab",
+          "Name": "",
+          "Description": "listWithNull",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "a8b05456f459490b9000e093d070f0b3",
+          "Name": "",
+          "Description": "listWithEmpty",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "d8e2783dfd1b4c599d57c073772cd70d",
+          "Name": "",
+          "Description": "listWithBoth",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        },
+        {
+          "Id": "eaf7bb872ce840a59d1b14755dd0fbe1",
+          "Name": "",
+          "Description": "mestedListsWithBoth",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Allows for DesignScript code to be authored directly"
+    },
+    {
+      "ConcreteType": "CoreNodeModels.Watch, CoreNodeModels",
+      "NodeType": "ExtensionNode",
+      "Id": "820f49f8fe254e159fc618fcabf244a0",
+      "Inputs": [
+        {
+          "Id": "95b4777acb604d8d859c838627f108b9",
+          "Name": "",
+          "Description": "Node to show output from",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Outputs": [
+        {
+          "Id": "ee52994205bc4a32a7f6d3069835009f",
+          "Name": "",
+          "Description": "Node output",
+          "UsingDefaultValue": false,
+          "Level": 2,
+          "UseLevels": false,
+          "KeepListStructure": false
+        }
+      ],
+      "Replication": "Disabled",
+      "Description": "Visualize the node's output"
+    }
+  ],
+  "Connectors": [
+    {
+      "Start": "d8e2783dfd1b4c599d57c073772cd70d",
+      "End": "95b4777acb604d8d859c838627f108b9",
+      "Id": "eb7bc548f21a488ca0613cec14657dad",
+      "IsHidden": "False"
+    }
+  ],
+  "Dependencies": [],
+  "NodeLibraryDependencies": [],
+  "Thumbnail": "",
+  "GraphDocumentationURL": null,
+  "ExtensionWorkspaceData": [
+    {
+      "ExtensionGuid": "28992e1d-abb9-417f-8b1b-05e053bee670",
+      "Name": "Properties",
+      "Version": "2.15",
+      "Data": {}
+    }
+  ],
+  "Author": "",
+  "Linting": {
+    "activeLinter": "None",
+    "activeLinterId": "7b75fb44-43fd-4631-a878-29f4d5d8399a",
+    "warningCount": 0,
+    "errorCount": 0
+  },
+  "Bindings": [],
+  "View": {
+    "Dynamo": {
+      "ScaleFactor": 1.0,
+      "HasRunWithoutCrash": true,
+      "IsVisibleInDynamoLibrary": true,
+      "Version": "2.16.0.1640",
+      "RunType": "Manual",
+      "RunPeriod": "1000"
+    },
+    "Camera": {
+      "Name": "Background Preview",
+      "EyeX": -17.0,
+      "EyeY": 24.0,
+      "EyeZ": 50.0,
+      "LookX": 12.0,
+      "LookY": -13.0,
+      "LookZ": -58.0,
+      "UpX": 0.0,
+      "UpY": 1.0,
+      "UpZ": 0.0
+    },
+    "ConnectorPins": [],
+    "NodeViews": [
+      {
+        "Name": "Lists",
+        "ShowGeometry": true,
+        "Id": "401b0f8d86534375b25e3aee1f7a1e8b",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 24.80580735908552,
+        "Y": -899.52508219098627
+      },
+      {
+        "Name": "List with Nulls and Empty List",
+        "ShowGeometry": true,
+        "Id": "820f49f8fe254e159fc618fcabf244a0",
+        "IsSetAsInput": false,
+        "IsSetAsOutput": false,
+        "Excluded": false,
+        "X": 655.64543606603888,
+        "Y": -759.57666386804465
+      }
+    ],
+    "Annotations": [],
+    "X": 229.41466618286279,
+    "Y": 626.31992987824788,
+    "Zoom": 0.63091179884008475
+  }
+}
