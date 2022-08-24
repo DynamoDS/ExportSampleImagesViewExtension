@@ -28,10 +28,10 @@ If you have done eveything correctly, you should see 'Show Export Sample Images 
 <img src="https://user-images.githubusercontent.com/5354594/186402333-7c49302b-a544-41ec-8dc2-20310c215419.png" width="200">
 
 ## Testing
-WIP
+In order to debug or run/create Unit Tests, you will have to take a few additional steps.
 
 ### Debugging
-WIP
+Since ExportSampleImages 
 
 ### Running Unit Tests
 
