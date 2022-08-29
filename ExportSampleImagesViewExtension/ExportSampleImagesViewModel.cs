@@ -66,6 +66,26 @@ namespace ExportSampleImages
             }
         }
 
+        private bool isSkip;
+        /// <summary>
+        ///     Contains user preference for skipping the pre-run
+        /// </summary>
+        public bool IsSkip
+        {
+            get
+            {
+                return isSkip;
+            }
+            set
+            {
+                if (isSkip != value)
+                {
+                    isSkip = value;
+                    RaisePropertyChanged(nameof(IsSkip));
+                }
+            }
+        }
+
         private string notificationMessage;
         /// <summary>
         ///     Contains notification text displayed on the UI
@@ -198,8 +218,11 @@ namespace ExportSampleImages
             if (files == null)
                 return;
 
-            PrepareAutomaticGraphs(files);
-            DoEvents();
+            if (!isSkip)
+            {
+                PrepareAutomaticGraphs(files);
+                DoEvents();
+            }
 
             foreach (var (file, index) in files.Select((file, index) => (file, index)))
             {
@@ -225,6 +248,10 @@ namespace ExportSampleImages
 
                 // 3 Zoom to fit Geometry
                 DynamoViewModel.BackgroundPreviewViewModel.ZoomToFitCommand.Execute(null);
+                DoEvents();
+                DynamoViewModel.BackgroundPreviewViewModel.CanNavigateBackground = true;
+                DoEvents();
+                DynamoViewModel.ZoomOutCommand.Execute(null);
                 DoEvents();
 
                 // 4 Auto Layout Nodes
