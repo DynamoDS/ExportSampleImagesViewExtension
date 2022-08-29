@@ -105,7 +105,7 @@ namespace ExportSampleImages
 
             p.CurrentWorkspaceChanged += OnCurrentWorkspaceChanged;
             p.CurrentWorkspaceCleared += OnCurrentWorkspaceCleared;
-
+            
             if (viewLoadedParamsInstance.CurrentWorkspaceModel is HomeWorkspaceModel)
             {
                 CurrentWorkspace = viewLoadedParamsInstance.CurrentWorkspaceModel as HomeWorkspaceModel;
@@ -198,6 +198,9 @@ namespace ExportSampleImages
             if (files == null)
                 return;
 
+            PrepareAutomaticGraphs(files);
+            DoEvents();
+
             foreach (var (file, index) in files.Select((file, index) => (file, index)))
             {
 
@@ -205,27 +208,62 @@ namespace ExportSampleImages
 
                 // 1 Open a graph
                 OpenDynamoGraph(file);
-
                 DoEvents(); // Allows visual tree to be reconstructed.
 
-                // 2 Auto Layout Nodes
-                DynamoViewModel.GraphAutoLayoutCommand.Execute(null);
-
+                // 2 Run 
+                CurrentWorkspace.Run();
                 DoEvents();
 
-                // 3 Save an image
+                //CurrentWorkspace.RunSettings.RunType = RunType.Automatic;
+                //DoEvents();
+
+                //CurrentWorkspace.RunSettings.RunEnabled = true;
+                //DoEvents();
+
+                //CurrentWorkspace.RequestRun();
+                //DoEvents();
+
+                // 3 Zoom to fit Geometry
+                DynamoViewModel.BackgroundPreviewViewModel.ZoomToFitCommand.Execute(null);
+                DoEvents();
+
+                // 4 Auto Layout Nodes
+                DynamoViewModel.GraphAutoLayoutCommand.Execute(null);
+                DoEvents();
+
+                // 5 Save an image
                 var graphName = Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName);
                 ExportCombinedImages(graphName);
 
-                // 4 Update the UI
+                // 6 Update the UI
                 graphDictionary[graphName].Exported = true;
-
                 DoEvents();
             }
 
             CleanUp();
 
             InformFinish(files.Count().ToString());
+        }
+
+        private void PrepareAutomaticGraphs(IOrderedEnumerable<string> files)
+        {
+            foreach (var file in files)
+            {
+                OpenDynamoGraph(file);
+                //DoEvents(); // Allows visual tree to be reconstructed.
+
+                CurrentWorkspace.RunSettings.RunType = RunType.Automatic;
+                DoEvents();
+
+                //CurrentWorkspace.Save(file);    // Un hides all geometry nodes ... cannot use
+                //DoEvents(); // Allows visual tree to be reconstructed.
+
+                DynamoViewModel.SaveCommand.Execute(null);
+                DoEvents(); // Allows visual tree to be reconstructed.
+
+                DynamoViewModel.CloseHomeWorkspaceCommand.Execute(null);
+                DoEvents(); // Allows visual tree to be reconstructed.
+            }
         }
 
         private void InformFinish(string count)
