@@ -66,7 +66,7 @@ namespace ExportSampleImages
             }
         }
 
-        private bool isSkip;
+        private bool isSkip = true;
         /// <summary>
         ///     Contains user preference for skipping the pre-run
         /// </summary>
@@ -254,22 +254,40 @@ namespace ExportSampleImages
                 DynamoViewModel.ZoomOutCommand.Execute(null);
                 DoEvents();
 
+                DynamoViewModel.BackgroundPreviewViewModel.CanNavigateBackground = false;
+                DoEvents();
+
                 // 4 Auto Layout Nodes
                 DynamoViewModel.GraphAutoLayoutCommand.Execute(null);
                 DoEvents();
 
                 // 5 Save an image
-                var graphName = Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName);
+                var graphName = GetImagePath(CurrentWorkspace.FileName);
                 ExportCombinedImages(graphName);
 
                 // 6 Update the UI
-                graphDictionary[graphName].Exported = true;
+                graphDictionary[Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName)].Exported = true;
                 DoEvents();
             }
 
             CleanUp();
 
             InformFinish(files.Count().ToString());
+        }
+
+        private string GetImagePath(string graph)
+        {
+            var graphName = Path.GetFileNameWithoutExtension(graph);
+            var directory = Path.GetDirectoryName(graph);
+            if (directory == null) return null;
+
+            var graphFolder = Path.GetFullPath(directory);
+            var newFolder = TargetPathViewModel.FolderPath +
+                            graphFolder.Substring(SourcePathViewModel.FolderPath.Length);
+
+            Directory.CreateDirectory(newFolder);
+
+            return Path.Combine(newFolder, graphName);
         }
 
         private void PrepareAutomaticGraphs(IOrderedEnumerable<string> files)
