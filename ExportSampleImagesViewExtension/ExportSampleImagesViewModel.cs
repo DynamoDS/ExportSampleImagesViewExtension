@@ -28,6 +28,7 @@ namespace ExportSampleImages
         internal HomeWorkspaceModel CurrentWorkspace;
         private readonly List<string> cleanupImageList = new List<string>();
         private Dictionary<string, GraphViewModel> graphDictionary = new Dictionary<string, GraphViewModel>();
+        private bool cancel;
 
         /// <summary>
         ///     Collection of graphs loaded for exporting
@@ -108,6 +109,7 @@ namespace ExportSampleImages
         }
 
         public DelegateCommand ExportGraphsCommand { get; set; }
+        public DelegateCommand CancelCommand { get; set; }
 
         #endregion
 
@@ -141,6 +143,7 @@ namespace ExportSampleImages
             SourcePathViewModel.PropertyChanged += SourcePathPropertyChanged;
 
             ExportGraphsCommand = new DelegateCommand(ExportGraphs);
+            CancelCommand = new DelegateCommand(Cancel);
         }
 
         // Handles source path changed
@@ -224,10 +227,14 @@ namespace ExportSampleImages
                 DoEvents();
             }
 
+            int counter = 0;
+
             foreach (var (file, index) in files.Select((file, index) => (file, index)))
             {
+                if (cancel) break;
 
                 NotificationMessage = String.Format(Properties.Resources.ProcessMsg, (index+1).ToString(), files.Count().ToString());
+                counter = index+1;
 
                 // 1 Open a graph
                 OpenDynamoGraph(file);
@@ -270,10 +277,13 @@ namespace ExportSampleImages
                 DoEvents();
             }
 
+            cancel = false;
+
             CleanUp();
 
-            InformFinish(files.Count().ToString());
+            InformFinish(counter.ToString());
         }
+
 
         private string GetImagePath(string graph)
         {
@@ -353,6 +363,11 @@ namespace ExportSampleImages
             catch (Exception)
             {
             }
+        }
+
+        private void Cancel(object obj)
+        {
+            cancel = true;
         }
 
         #endregion

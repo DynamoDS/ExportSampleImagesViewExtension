@@ -61,6 +61,15 @@ namespace ExportSampleImages.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        public static string CancelButtonText {
+            get {
+                return ResourceManager.GetString("CancelButtonText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         public static System.Drawing.Bitmap checkmark {
@@ -158,6 +167,15 @@ namespace ExportSampleImages.Properties {
         public static string SelectFolderMsg {
             get {
                 return ResourceManager.GetString("SelectFolderMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Skip Automatic mode pre-run..
+        /// </summary>
+        public static string SkipPrerunCheckboxMsg {
+            get {
+                return ResourceManager.GetString("SkipPrerunCheckboxMsg", resourceCulture);
             }
         }
         
