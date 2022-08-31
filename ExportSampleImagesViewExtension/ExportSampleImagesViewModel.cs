@@ -87,6 +87,26 @@ namespace ExportSampleImages
             }
         }
 
+        private bool isKeepFolderStructure = true;
+        /// <summary>
+        ///     Contains user preference to retain folder structure for images
+        /// </summary>
+        public bool IsKeepFolderStructure
+        {
+            get
+            {
+                return isKeepFolderStructure;
+            }
+            set
+            {
+                if (isKeepFolderStructure != value)
+                {
+                    isKeepFolderStructure = value;
+                    RaisePropertyChanged(nameof(IsKeepFolderStructure));
+                }
+            }
+        }
+        
         private string notificationMessage;
         /// <summary>
         ///     Contains notification text displayed on the UI
@@ -227,14 +247,16 @@ namespace ExportSampleImages
                 DoEvents();
             }
 
-            int counter = 0;
+            ResetUi();
+
+            int progress = 0;
 
             foreach (var (file, index) in files.Select((file, index) => (file, index)))
             {
                 if (cancel) break;
 
                 NotificationMessage = String.Format(Properties.Resources.ProcessMsg, (index+1).ToString(), files.Count().ToString());
-                counter = index+1;
+                progress = index+1;
 
                 // 1 Open a graph
                 OpenDynamoGraph(file);
@@ -277,11 +299,15 @@ namespace ExportSampleImages
                 DoEvents();
             }
 
-            cancel = false;
-
             CleanUp();
 
-            InformFinish(counter.ToString());
+            InformFinish(progress.ToString());
+        }
+
+        private void ResetUi()
+        {
+            cancel = false;
+            graphDictionary.Values.ToList().ForEach(x => x.Exported = false);
         }
 
 
@@ -292,10 +318,14 @@ namespace ExportSampleImages
             if (directory == null) return null;
 
             var graphFolder = Path.GetFullPath(directory);
-            var newFolder = TargetPathViewModel.FolderPath +
-                            graphFolder.Substring(SourcePathViewModel.FolderPath.Length);
+            var newFolder = IsKeepFolderStructure ? 
+                    TargetPathViewModel.FolderPath + graphFolder.Substring(SourcePathViewModel.FolderPath.Length) :
+                    TargetPathViewModel.FolderPath;
 
-            Directory.CreateDirectory(newFolder);
+            if(isKeepFolderStructure)
+            {
+                Directory.CreateDirectory(newFolder);
+            }
 
             return Path.Combine(newFolder, graphName);
         }

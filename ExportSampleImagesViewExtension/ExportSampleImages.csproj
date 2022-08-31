@@ -267,4 +267,7 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y $(SolutionDir)ExportSampleImagesViewExtension\manifest\*.xml C:\Users\dneno\source\repos\Dynamo\bin\AnyCPU\Debug\viewExtensions</PostBuildEvent>
+  </PropertyGroup>
 </Project>

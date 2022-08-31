@@ -142,6 +142,9 @@
   <data name="HeaderText" xml:space="preserve">
     <value>Show Export Sample Images</value>
   </data>
+  <data name="KeepFolderStructureCheckboxMsg" xml:space="preserve">
+    <value>Keep folder structure.</value>
+  </data>
   <data name="NotificationMsg" xml:space="preserve">
     <value>The target folder contains {0} Dynamo graphs.</value>
   </data>

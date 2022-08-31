@@ -134,6 +134,15 @@ namespace ExportSampleImages.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Keep folder structure..
+        /// </summary>
+        public static string KeepFolderStructureCheckboxMsg {
+            get {
+                return ResourceManager.GetString("KeepFolderStructureCheckboxMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The target folder contains {0} Dynamo graphs..
         /// </summary>
         public static string NotificationMsg {
