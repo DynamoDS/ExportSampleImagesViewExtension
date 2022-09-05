@@ -265,7 +265,7 @@ namespace ExportSampleImages
                 // 2 Run 
                 CurrentWorkspace.Run();
                 DoEvents();
-
+                
                 //CurrentWorkspace.RunSettings.RunType = RunType.Automatic;
                 //DoEvents();
 
