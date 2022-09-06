@@ -44,15 +44,15 @@ namespace ExportSampleImages
 
         /// <summary>
         ///     Resize logic for bitmap images.
-        ///     Will resize the image up/down to the smaller/bigger dimension
+        ///     Match target to source Image 
         /// </summary>
         /// <param name="sourceImg">The image to match the size to</param>
         /// <param name="targetImg">The image to be resized</param>
         /// <returns></returns>
         public static Bitmap Resize(Bitmap sourceImg, Bitmap targetImg, double scale = 1.0)
         {
-            var scaleFactor = Math.Min(sourceImg.Width / (float) targetImg.Width,
-                sourceImg.Height / (float) targetImg.Height);
+            var scaleFactor = Math.Max(sourceImg.Width / (float) targetImg.Width,
+                sourceImg.Height / (float) targetImg.Height);   // Take the smaller of the two ratios
             var newWidth = (int) (targetImg.Width * scaleFactor * scale);
             var newHeight = (int) (targetImg.Height * scaleFactor * scale);
             var newImage = new Bitmap(newWidth, newHeight);
@@ -87,26 +87,28 @@ namespace ExportSampleImages
         /// <returns></returns>
         public static Bitmap OverlayImages(string background, string foreground, double scale = 1.0)
         {
-            Bitmap finalImage;
+            Bitmap finalImage; 
+
+            GetCurrentDPI(out var dpiX, out var dpiY);
 
             using (var baseImage = (Bitmap) Image.FromFile(background))
             {
                 using (var overlayImage = (Bitmap) Image.FromFile(foreground))
                 {
-                    var resizedImage = Resize(baseImage, overlayImage, scale);
+                    overlayImage.SetResolution(dpiX, dpiY);
+                    var resizedImage = Resize(overlayImage, baseImage, scale);  // Resize the 3D background 
 
-                    finalImage = new Bitmap(baseImage.Width, baseImage.Height, PixelFormat.Format32bppArgb);
+                    finalImage = new Bitmap(resizedImage.Width, resizedImage.Height, PixelFormat.Format32bppArgb);
 
-                    GetCurrentDPI(out var dpiX, out var dpiY);
 
                     finalImage.SetResolution(dpiX, dpiY);
                     var graphics = Graphics.FromImage(finalImage);
 
                     graphics.CompositingMode = CompositingMode.SourceOver;
-                    graphics.DrawImage(baseImage, 0, 0);
-                    graphics.DrawImage(resizedImage,
-                        Convert.ToInt32((baseImage.Width - resizedImage.Width) * (float) 0.5),
-                        Convert.ToInt32((baseImage.Height - resizedImage.Height) *
+                    graphics.DrawImage(resizedImage, 0, 0);
+                    graphics.DrawImage(overlayImage,
+                        Convert.ToInt32((resizedImage.Width - overlayImage.Width) * (float) 0.5),
+                        Convert.ToInt32((resizedImage.Height - overlayImage.Height) *
                                         (float) 0.5)); // Center the overlaid image
                 }
             }

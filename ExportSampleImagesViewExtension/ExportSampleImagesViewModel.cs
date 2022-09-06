@@ -368,7 +368,7 @@ namespace ExportSampleImages
             DynamoViewModel.Save3DImageCommand.Execute(pathBackground);
             DynamoViewModel.SaveImageCommand.Execute(pathForeground);
 
-            var finalImage = Utilities.OverlayImages(pathBackground, pathForeground, 0.9);
+            var finalImage = Utilities.OverlayImages(pathBackground, pathForeground, 1.1);
             Utilities.SaveBitmapToPng(finalImage, TargetPathViewModel.FolderPath, graphName);
 
             cleanupImageList.Add(pathForeground);
