@@ -117,11 +117,12 @@ namespace ExportSampleImages
                     using (var graphics = Graphics.FromImage(finalImage))
                     {
                         graphics.CompositingMode = CompositingMode.SourceOver;
-                        graphics.DrawImage(resizedImage, 0, 0);
+                        graphics.Clear(Color.White);    // Set a white background
+                        graphics.DrawImage(resizedImage, 0, resizedImage.Height * (float)0.15); // Move the 3D Background a bit down
                         graphics.DrawImage(overlayImage,
                             Convert.ToInt32((resizedImage.Width - overlayImage.Width) * (float) 0.5),
                             Convert.ToInt32((resizedImage.Height - overlayImage.Height) *
-                                            (float) 0.5)); // Center the overlaid image
+                                            (float) 0.25)); // Offset the overlaid image in the upper center part 
                     }
                 }
             }

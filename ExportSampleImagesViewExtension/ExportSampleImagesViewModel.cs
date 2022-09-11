@@ -420,7 +420,7 @@ namespace ExportSampleImages
             DynamoViewModel.SaveImageCommand.Execute(pathForeground);
 
             var finalImage = Utilities.OverlayImages(pathBackground, pathForeground, 1.1);
-            Utilities.SaveBitmapToPng(finalImage, TargetPathViewModel.FolderPath, graphName);
+            Utilities.SaveBitmapToJpg(finalImage, TargetPathViewModel.FolderPath, graphName);
 
             cleanupImageList.Add(pathForeground);
             cleanupImageList.Add(pathBackground);
