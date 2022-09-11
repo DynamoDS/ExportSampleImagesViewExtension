@@ -5,8 +5,10 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Security.Permissions;
+using System.Threading;
 using System.Windows;
 using System.Windows.Threading;
+using Dynamo.Controls;
 using Dynamo.Core;
 using Dynamo.Graph.Workspaces;
 using Dynamo.Models;
@@ -14,6 +16,7 @@ using Dynamo.UI.Commands;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using Dynamo.Wpf.Utilities;
+using Dynamo.Wpf.ViewModels.Watch3D;
 using ExportSampleImages.Controls;
 
 namespace ExportSampleImages
@@ -25,6 +28,7 @@ namespace ExportSampleImages
 
         private readonly ViewLoadedParams viewLoadedParamsInstance;
         internal DynamoViewModel DynamoViewModel;
+        internal HelixWatch3DViewModel Helix3DViewModel;
         internal HomeWorkspaceModel CurrentWorkspace;
         private readonly List<string> cleanupImageList = new List<string>();
         private Dictionary<string, GraphViewModel> graphDictionary = new Dictionary<string, GraphViewModel>();
@@ -108,6 +112,8 @@ namespace ExportSampleImages
         }
         
         private string notificationMessage;
+        private SemaphoreSlim semaphore;
+
         /// <summary>
         ///     Contains notification text displayed on the UI
         /// </summary>
@@ -152,7 +158,10 @@ namespace ExportSampleImages
             {
                 CurrentWorkspace = viewLoadedParamsInstance.CurrentWorkspaceModel as HomeWorkspaceModel;
                 DynamoViewModel = viewLoadedParamsInstance.DynamoWindow.DataContext as DynamoViewModel;
+                Helix3DViewModel = DynamoViewModel.BackgroundPreviewViewModel as HelixWatch3DViewModel;
             }
+
+            semaphore = new SemaphoreSlim(0, 1);
 
             TargetPathViewModel = new PathViewModel
                 {Type = PathType.Target, Owner = viewLoadedParamsInstance.DynamoWindow};
@@ -165,6 +174,7 @@ namespace ExportSampleImages
             ExportGraphsCommand = new DelegateCommand(ExportGraphs);
             CancelCommand = new DelegateCommand(Cancel);
         }
+
 
         // Handles source path changed
         private void SourcePathPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
@@ -220,6 +230,7 @@ namespace ExportSampleImages
 
         private void CurrentWorkspaceOnEvaluationCompleted(object sender, EvaluationCompletedEventArgs e)
         {
+            semaphore.Release();
             CurrentWorkspace.EvaluationCompleted -= CurrentWorkspaceOnEvaluationCompleted;
         }
 
@@ -258,50 +269,78 @@ namespace ExportSampleImages
                 NotificationMessage = String.Format(Properties.Resources.ProcessMsg, (index+1).ToString(), files.Count().ToString());
                 progress = index+1;
 
+                semaphore = new SemaphoreSlim(0, 1);
+
                 // 1 Open a graph
+                // If the graph is set on Automatic, it will run and set the 
+                // HasRunWithoutCrash flag to true. 
+                // If teh graph is set on Manual, the flag will be false
                 OpenDynamoGraph(file);
                 DoEvents(); // Allows visual tree to be reconstructed.
 
-                // 2 Run 
-                CurrentWorkspace.Run();
-                DoEvents();
-                
-                //CurrentWorkspace.RunSettings.RunType = RunType.Automatic;
-                //DoEvents();
+                if (!CurrentWorkspace.HasRunWithoutCrash)
+                {
+                    // 2 Run 
+                    CurrentWorkspace.Run();
+                    DoEvents();
 
-                //CurrentWorkspace.RunSettings.RunEnabled = true;
-                //DoEvents();
+                    semaphore.Wait(0);
+                }
 
-                //CurrentWorkspace.RequestRun();
-                //DoEvents();
-
-                // 3 Zoom to fit Geometry
-                DynamoViewModel.BackgroundPreviewViewModel.ZoomToFitCommand.Execute(null);
-                DoEvents();
-                DynamoViewModel.BackgroundPreviewViewModel.CanNavigateBackground = true;
-                DoEvents();
-                DynamoViewModel.ZoomOutCommand.Execute(null);
-                DoEvents();
-
-                DynamoViewModel.BackgroundPreviewViewModel.CanNavigateBackground = false;
-                DoEvents();
-
-                // 4 Auto Layout Nodes
-                DynamoViewModel.GraphAutoLayoutCommand.Execute(null);
-                DoEvents();
-
-                // 5 Save an image
-                var graphName = GetImagePath(CurrentWorkspace.FileName);
-                ExportCombinedImages(graphName);
-
-                // 6 Update the UI
-                graphDictionary[Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName)].Exported = true;
-                DoEvents();
+                // New method introduced in Helix3DViewModel
+                if (Helix3DViewModel.HasRenderedGeometry)
+                {
+                    ExportGraphAndBackground();
+                }
+                else
+                {
+                    ExportGraphOnly();
+                }
             }
 
             CleanUp();
 
             InformFinish(progress.ToString());
+        }
+
+        private void ExportGraphAndBackground()
+        {
+            DynamoViewModel.BackgroundPreviewViewModel.ZoomToFitCommand.Execute(null);
+            DoEvents();
+            DynamoViewModel.BackgroundPreviewViewModel.CanNavigateBackground = true;
+            DoEvents();
+            DynamoViewModel.ZoomOutCommand.Execute(null);
+            DoEvents();
+
+            DynamoViewModel.BackgroundPreviewViewModel.CanNavigateBackground = false;
+            DoEvents();
+
+            // 4 Auto Layout Nodes
+            DynamoViewModel.GraphAutoLayoutCommand.Execute(null);
+            DoEvents();
+
+            // 5 Save an image
+            var graphName = GetImagePath(CurrentWorkspace.FileName);
+            ExportCombinedImages(graphName);
+
+            // 6 Update the UI
+            graphDictionary[Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName)].Exported = true;
+            DoEvents();
+        }
+
+        private void ExportGraphOnly()
+        {
+            // 4 Auto Layout Nodes
+            DynamoViewModel.GraphAutoLayoutCommand.Execute(null);
+            DoEvents();
+
+            // 5 Save an image
+            var graphName = GetImagePath(CurrentWorkspace.FileName);
+            ExportGraphOnlyImages(graphName);
+
+            // 6 Update the UI
+            graphDictionary[Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName)].Exported = true;
+            DoEvents();
         }
 
         private void ResetUi()
@@ -357,6 +396,18 @@ namespace ExportSampleImages
             var owner = Window.GetWindow(viewLoadedParamsInstance.DynamoWindow);
 
             MessageBoxService.Show(owner, successMessage, Properties.Resources.FinishMsgTitle, MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        private void ExportGraphOnlyImages(string graphName)
+        {
+            var pathForeground = Path.Combine(TargetPathViewModel.FolderPath, graphName + "_f.png");
+
+            DynamoViewModel.SaveImageCommand.Execute(pathForeground);
+
+            var finalImage = Utilities.PrepareImages(pathForeground);
+            Utilities.SaveBitmapToJpg(finalImage, TargetPathViewModel.FolderPath, graphName);
+
+            cleanupImageList.Add(pathForeground);
         }
 
 

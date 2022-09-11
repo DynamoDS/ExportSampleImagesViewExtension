@@ -80,6 +80,18 @@ namespace ExportSampleImages
         }
 
         /// <summary>
+        ///     Saves a bitmap image to jpg
+        /// </summary>
+        /// <param name="image"></param>
+        /// <param name="path"></param>
+        /// <param name="name"></param>
+        public static void SaveBitmapToJpg(Bitmap image, string path, string name)
+        {
+            if (image == null) return;
+            image.Save(Path.Combine(path, name + ".jpg"), ImageFormat.Jpeg);
+        }
+
+        /// <summary>
         ///     Combines 2 bitmap images with transparent background
         /// </summary>
         /// <param name="background"></param>
@@ -102,14 +114,37 @@ namespace ExportSampleImages
 
 
                     finalImage.SetResolution(dpiX, dpiY);
-                    var graphics = Graphics.FromImage(finalImage);
+                    using (var graphics = Graphics.FromImage(finalImage))
+                    {
+                        graphics.CompositingMode = CompositingMode.SourceOver;
+                        graphics.DrawImage(resizedImage, 0, 0);
+                        graphics.DrawImage(overlayImage,
+                            Convert.ToInt32((resizedImage.Width - overlayImage.Width) * (float) 0.5),
+                            Convert.ToInt32((resizedImage.Height - overlayImage.Height) *
+                                            (float) 0.5)); // Center the overlaid image
+                    }
+                }
+            }
 
-                    graphics.CompositingMode = CompositingMode.SourceOver;
-                    graphics.DrawImage(resizedImage, 0, 0);
-                    graphics.DrawImage(overlayImage,
-                        Convert.ToInt32((resizedImage.Width - overlayImage.Width) * (float) 0.5),
-                        Convert.ToInt32((resizedImage.Height - overlayImage.Height) *
-                                        (float) 0.5)); // Center the overlaid image
+            return finalImage;
+        }
+
+        public static Bitmap PrepareImages(string image, double scale = 1.0)
+        {
+            Bitmap finalImage;
+
+            GetCurrentDPI(out var dpiX, out var dpiY);
+
+            using (var graphImage = (Bitmap)Image.FromFile(image))
+            {
+                graphImage.SetResolution(dpiX, dpiY);
+
+                finalImage = new Bitmap(graphImage.Width, graphImage.Height, PixelFormat.Format32bppArgb);
+                finalImage.SetResolution(dpiX, dpiY);
+                using (var graphics = Graphics.FromImage(finalImage))
+                {
+                    graphics.Clear(Color.White);
+                    graphics.DrawImage(graphImage, 0, 0);
                 }
             }
 
