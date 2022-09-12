@@ -52,9 +52,9 @@
         <StackPanel Orientation="Vertical" Grid.Row="1">
             <StackPanel>
                 <CheckBox VerticalContentAlignment="Center"
-                          IsChecked="{Binding IsSkip}" 
+                          IsChecked="{Binding IsZoomedOut}" 
                           Margin="5 0">
-                    <Label Content="{x:Static p:Resources.SkipPrerunCheckboxMsg}"
+                    <Label Content="{x:Static p:Resources.ZoomGeometryCheckboxMsg}"
                            VerticalAlignment="Center"
                            VerticalContentAlignment="Center"
                            Margin="3 3 0 0"  

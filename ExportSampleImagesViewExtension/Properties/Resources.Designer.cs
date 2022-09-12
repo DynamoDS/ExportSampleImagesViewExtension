@@ -180,15 +180,6 @@ namespace ExportSampleImages.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Skip Automatic mode pre-run..
-        /// </summary>
-        public static string SkipPrerunCheckboxMsg {
-            get {
-                return ResourceManager.GetString("SkipPrerunCheckboxMsg", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Source folder.
         /// </summary>
         public static string SourceFolderMsg {
@@ -212,6 +203,15 @@ namespace ExportSampleImages.Properties {
         public static string UpdatePathTooltip {
             get {
                 return ResourceManager.GetString("UpdatePathTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Zoom out geometry background preview..
+        /// </summary>
+        public static string ZoomGeometryCheckboxMsg {
+            get {
+                return ResourceManager.GetString("ZoomGeometryCheckboxMsg", resourceCulture);
             }
         }
     }

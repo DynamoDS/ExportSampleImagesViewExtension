@@ -70,27 +70,27 @@ namespace ExportSampleImages
             }
         }
 
-        private bool isSkip = true;
+        private bool isZoomedOut = true;
         /// <summary>
         ///     Contains user preference for skipping the pre-run
         /// </summary>
-        public bool IsSkip
+        public bool IsZoomedOut
         {
             get
             {
-                return isSkip;
+                return isZoomedOut;
             }
             set
             {
-                if (isSkip != value)
+                if (isZoomedOut != value)
                 {
-                    isSkip = value;
-                    RaisePropertyChanged(nameof(IsSkip));
+                    isZoomedOut = value;
+                    RaisePropertyChanged(nameof(IsZoomedOut));
                 }
             }
         }
 
-        private bool isKeepFolderStructure = true;
+        private bool isKeepFolderStructure = false;
         /// <summary>
         ///     Contains user preference to retain folder structure for images
         /// </summary>
@@ -250,13 +250,7 @@ namespace ExportSampleImages
             var files = Utilities.GetAllFilesOfExtension(SourcePathViewModel.FolderPath)?.OrderBy(x => x);
             if (files == null)
                 return;
-
-            if (!isSkip)
-            {
-                PrepareAutomaticGraphs(files);
-                DoEvents();
-            }
-
+            
             ResetUi();
 
             int progress = 0;
@@ -312,13 +306,18 @@ namespace ExportSampleImages
         {
             DynamoViewModel.BackgroundPreviewViewModel.ZoomToFitCommand.Execute(null);
             DoEvents();
-            DynamoViewModel.BackgroundPreviewViewModel.CanNavigateBackground = true;
-            DoEvents();
-            DynamoViewModel.ZoomOutCommand.Execute(null);
-            DoEvents();
 
-            DynamoViewModel.BackgroundPreviewViewModel.CanNavigateBackground = false;
-            DoEvents();
+            if (isZoomedOut)
+            {
+                DynamoViewModel.BackgroundPreviewViewModel.CanNavigateBackground = true;
+                DoEvents();
+
+                DynamoViewModel.ZoomOutCommand.Execute(null);
+                DoEvents();
+
+                DynamoViewModel.BackgroundPreviewViewModel.CanNavigateBackground = false;
+                DoEvents();
+            }
 
             // 4 Auto Layout Nodes
             DynamoViewModel.GraphAutoLayoutCommand.Execute(null);
@@ -366,26 +365,6 @@ namespace ExportSampleImages
             return Path.Combine(newFolder, graphName);
         }
 
-        private void PrepareAutomaticGraphs(IOrderedEnumerable<string> files)
-        {
-            foreach (var file in files)
-            {
-                OpenDynamoGraph(file);
-                //DoEvents(); // Allows visual tree to be reconstructed.
-
-                CurrentWorkspace.RunSettings.RunType = RunType.Automatic;
-                DoEvents();
-
-                //CurrentWorkspace.Save(file);    // Un hides all geometry nodes ... cannot use
-                //DoEvents(); // Allows visual tree to be reconstructed.
-
-                DynamoViewModel.SaveCommand.Execute(null);
-                DoEvents(); // Allows visual tree to be reconstructed.
-
-                DynamoViewModel.CloseHomeWorkspaceCommand.Execute(null);
-                DoEvents(); // Allows visual tree to be reconstructed.
-            }
-        }
 
         private void InformFinish(string count)
         {
@@ -394,6 +373,7 @@ namespace ExportSampleImages
 
             MessageBoxService.Show(owner, successMessage, Properties.Resources.FinishMsgTitle, MessageBoxButton.OK, MessageBoxImage.Information);
         }
+
 
         private void ExportGraphOnlyImages(string graphName)
         {

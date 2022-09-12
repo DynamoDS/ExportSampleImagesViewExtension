@@ -157,9 +157,6 @@
   <data name="SelectFolderMsg" xml:space="preserve">
     <value>Select folder ..</value>
   </data>
-  <data name="SkipPrerunCheckboxMsg" xml:space="preserve">
-    <value>Skip Automatic mode pre-run.</value>
-  </data>
   <data name="SourceFolderMsg" xml:space="preserve">
     <value>Source folder</value>
   </data>
@@ -168,5 +165,8 @@
   </data>
   <data name="UpdatePathTooltip" xml:space="preserve">
     <value>Select folder.</value>
+  </data>
+  <data name="ZoomGeometryCheckboxMsg" xml:space="preserve">
+    <value>Zoom out geometry background preview.</value>
   </data>
 </root>
