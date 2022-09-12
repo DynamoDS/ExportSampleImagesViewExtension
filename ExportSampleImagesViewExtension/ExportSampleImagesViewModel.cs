@@ -30,7 +30,6 @@ namespace ExportSampleImages
         internal DynamoViewModel DynamoViewModel;
         internal HelixWatch3DViewModel Helix3DViewModel;
         internal HomeWorkspaceModel CurrentWorkspace;
-        private readonly List<string> cleanupImageList = new List<string>();
         private Dictionary<string, GraphViewModel> graphDictionary = new Dictionary<string, GraphViewModel>();
         private bool cancel;
 
@@ -276,15 +275,19 @@ namespace ExportSampleImages
                 // HasRunWithoutCrash flag to true. 
                 // If teh graph is set on Manual, the flag will be false
                 OpenDynamoGraph(file);
-                DoEvents(); // Allows visual tree to be reconstructed.
 
-                if (!CurrentWorkspace.HasRunWithoutCrash)
+                if (CurrentWorkspace.RunSettings.RunType == RunType.Manual || !CurrentWorkspace.HasRunWithoutCrash)
                 {
                     // 2 Run 
                     CurrentWorkspace.Run();
                     DoEvents();
 
                     semaphore.Wait(0);
+                    DoEvents(); // 
+                }
+                else
+                {
+                    DoEvents(); // Allows visual tree to be reconstructed.
                 }
 
                 // New method introduced in Helix3DViewModel
@@ -296,10 +299,12 @@ namespace ExportSampleImages
                 {
                     ExportGraphOnly();
                 }
+
+                // 6 Update the UI
+                graphDictionary[Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName)].Exported = true;
+                RaisePropertyChanged(nameof(Graphs));
             }
-
-            CleanUp();
-
+            
             InformFinish(progress.ToString());
         }
 
@@ -322,10 +327,6 @@ namespace ExportSampleImages
             // 5 Save an image
             var graphName = GetImagePath(CurrentWorkspace.FileName);
             ExportCombinedImages(graphName);
-
-            // 6 Update the UI
-            graphDictionary[Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName)].Exported = true;
-            DoEvents();
         }
 
         private void ExportGraphOnly()
@@ -337,10 +338,6 @@ namespace ExportSampleImages
             // 5 Save an image
             var graphName = GetImagePath(CurrentWorkspace.FileName);
             ExportGraphOnlyImages(graphName);
-
-            // 6 Update the UI
-            graphDictionary[Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName)].Exported = true;
-            DoEvents();
         }
 
         private void ResetUi()
@@ -405,9 +402,16 @@ namespace ExportSampleImages
             DynamoViewModel.SaveImageCommand.Execute(pathForeground);
 
             var finalImage = Utilities.PrepareImages(pathForeground);
+            if (finalImage == null)
+            {
+                CleanUp(pathForeground);
+
+                return;
+            }
             Utilities.SaveBitmapToJpg(finalImage, TargetPathViewModel.FolderPath, graphName);
 
-            cleanupImageList.Add(pathForeground);
+
+            CleanUp(pathForeground);
         }
 
 
@@ -420,18 +424,24 @@ namespace ExportSampleImages
             DynamoViewModel.SaveImageCommand.Execute(pathForeground);
 
             var finalImage = Utilities.OverlayImages(pathBackground, pathForeground, 1.1);
+            if (finalImage == null)
+            {
+                CleanUp(pathForeground);
+                CleanUp(pathBackground);
+
+                return;
+            }
             Utilities.SaveBitmapToJpg(finalImage, TargetPathViewModel.FolderPath, graphName);
 
-            cleanupImageList.Add(pathForeground);
-            cleanupImageList.Add(pathBackground);
+            CleanUp(pathForeground);
+            CleanUp(pathBackground);
         }
 
 
-        private void CleanUp()
+        private void CleanUp(string image)
         {
-            if (cleanupImageList == null || cleanupImageList.Count == 0) return;
-
-            foreach (var image in cleanupImageList) File.Delete(image);
+            if(File.Exists(image))
+                File.Delete(image);
         }
 
         // TODO: Should we bubble errors to Dynamo?

@@ -114,15 +114,23 @@ namespace ExportSampleImages
 
 
                     finalImage.SetResolution(dpiX, dpiY);
-                    using (var graphics = Graphics.FromImage(finalImage))
+                    try
                     {
+                        var graphics = Graphics.FromImage(finalImage);
+
                         graphics.CompositingMode = CompositingMode.SourceOver;
-                        graphics.Clear(Color.White);    // Set a white background
-                        graphics.DrawImage(resizedImage, 0, resizedImage.Height * (float)0.15); // Move the 3D Background a bit down
+                        graphics.Clear(Color.White); // Set a white background
+                        graphics.DrawImage(resizedImage, 0,
+                            resizedImage.Height * (float) 0.15); // Move the 3D Background a bit down
                         graphics.DrawImage(overlayImage,
                             Convert.ToInt32((resizedImage.Width - overlayImage.Width) * (float) 0.5),
                             Convert.ToInt32((resizedImage.Height - overlayImage.Height) *
                                             (float) 0.25)); // Offset the overlaid image in the upper center part 
+
+                    }
+                    catch(Exception)
+                    {
+                        return null;
                     }
                 }
             }
@@ -136,17 +144,24 @@ namespace ExportSampleImages
 
             GetCurrentDPI(out var dpiX, out var dpiY);
 
-            using (var graphImage = (Bitmap)Image.FromFile(image))
+            try
             {
-                graphImage.SetResolution(dpiX, dpiY);
-
-                finalImage = new Bitmap(graphImage.Width, graphImage.Height, PixelFormat.Format32bppArgb);
-                finalImage.SetResolution(dpiX, dpiY);
-                using (var graphics = Graphics.FromImage(finalImage))
+                using (var graphImage = (Bitmap) Image.FromFile(image))
                 {
-                    graphics.Clear(Color.White);
-                    graphics.DrawImage(graphImage, 0, 0);
+                    graphImage.SetResolution(dpiX, dpiY);
+
+                    finalImage = new Bitmap(graphImage.Width, graphImage.Height, PixelFormat.Format32bppArgb);
+                    finalImage.SetResolution(dpiX, dpiY);
+                    using (var graphics = Graphics.FromImage(finalImage))
+                    {
+                        graphics.Clear(Color.White);
+                        graphics.DrawImage(graphImage, 0, 0);
+                    }
                 }
+            }
+            catch (Exception)
+            {
+                return null;
             }
 
             return finalImage;
