@@ -39,11 +39,7 @@ In order to debug or run/create Unit Tests, you will have to take a few addition
 - Remove Export Sample Images from your Dynamo packages folder if you have it installed from package manager (otherwise ```ExportSampleImagesViewExtension.dll``` will get loaded twice). 
 - Launch DynamoSandbox.exe, then click View-> Open Export Sample Images and use start debugging as you normally would.
 
-
 ### Testing
-Since ExportSampleImages 
-
-### Running Unit Tests
 - Install NUnit 2 Test Adapter from VisualStudio->Extensions->Manage Extensions->Online.
 - Open Test Explorer from VisualStudio->Test->Test Explorer. Now you should see a list of TuneUpTests.
 - **If you are running Visual Studio 2022 and you are having issues, try using **ReSharper** and the test module it provides instead.*
