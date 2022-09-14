@@ -1,4 +1,5 @@
 ﻿<ViewExtensionDefinition>
-	<AssemblyPath>C:\Users\dneno\source\repos\DynamoCustom\ExportSampleImagesViewExtension\ExportSampleImagesViewExtension\bin\Debug\ExportSampleImagesViewExtension.dll</AssemblyPath>
+	<!--<AssemblyPath>C:\Users\dneno\source\repos\DynamoCustom\ExportSampleImagesViewExtension\ExportSampleImagesViewExtension\bin\Debug\ExportSampleImagesViewExtension.dll</AssemblyPath>-->
+	<AssemblyPath>[YOUR_EXTENSION_SOLUTION_LOCATION]\ExportSampleImagesViewExtension\bin\Debug\ExportSampleImagesViewExtension.dll</AssemblyPath>
 	<TypeName>ExportSampleImages.ExportSampleImagesViewExtension</TypeName>
 </ViewExtensionDefinition>
