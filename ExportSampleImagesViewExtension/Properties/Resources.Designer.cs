@@ -171,6 +171,15 @@ namespace ExportSampleImages.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Resume previous session..
+        /// </summary>
+        public static string ResumeCheckboxMsg {
+            get {
+                return ResourceManager.GetString("ResumeCheckboxMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select folder ...
         /// </summary>
         public static string SelectFolderMsg {

@@ -2,17 +2,22 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Permissions;
+using System.Text;
 using System.Threading;
 using System.Windows;
+using System.Windows.Documents;
 using System.Windows.Threading;
 using Dynamo.Controls;
 using Dynamo.Core;
 using Dynamo.Graph.Workspaces;
 using Dynamo.Models;
+using Dynamo.Scheduler;
 using Dynamo.UI.Commands;
+using Dynamo.Utilities;
 using Dynamo.ViewModels;
 using Dynamo.Wpf.Extensions;
 using Dynamo.Wpf.Utilities;
@@ -21,6 +26,13 @@ using ExportSampleImages.Controls;
 
 namespace ExportSampleImages
 {
+    public enum RunPhase
+    {
+        Render,
+        Export,
+        Save
+    };
+
     public class ExportSampleImagesViewModel : NotificationObject, IDisposable
     {
 
@@ -30,8 +42,14 @@ namespace ExportSampleImages
         internal DynamoViewModel DynamoViewModel;
         internal HelixWatch3DViewModel Helix3DViewModel;
         internal HomeWorkspaceModel CurrentWorkspace;
-        private Dictionary<string, GraphViewModel> graphDictionary = new Dictionary<string, GraphViewModel>();
-        private bool cancel;
+        private Dictionary<int, GraphViewModel> graphDictionary = new Dictionary<int, GraphViewModel>();
+        private RunPhase phase = RunPhase.Render;
+        private bool locked = false;
+        private bool finished = true;
+        private DynamoScheduler scheduler;
+        int progress = 0;
+        
+        public StringBuilder sb;
 
         /// <summary>
         ///     Collection of graphs loaded for exporting
@@ -90,7 +108,49 @@ namespace ExportSampleImages
             }
         }
 
-        private bool isKeepFolderStructure = false;
+        private bool resume = false;
+        /// <summary>
+        ///     When this flag is set to true, will attempt to resume progress
+        ///     based on the log file in the current destination folder
+        /// </summary>
+        public bool Resume
+        {
+            get
+            {
+                return resume;
+            }
+            set
+            {
+                if (resume != value)
+                {
+                    resume = value;
+                    RaisePropertyChanged(nameof(Resume));
+                }
+            }
+        }
+
+        //private bool disablePrompts = true;
+        ///// <summary>
+        /////     Indicates if Dynamo should suppress Warning dialogs
+        /////     If not set, the run will be interrupted when prompt is shown
+        ///// </summary>
+        //public bool DisablePrompts
+        //{
+        //    get
+        //    {
+        //        return disablePrompts;
+        //    }
+        //    set
+        //    {
+        //        if (disablePrompts != value)
+        //        {
+        //            disablePrompts = value;
+        //            RaisePropertyChanged(nameof(DisablePrompts));
+        //        }
+        //    }
+        //}
+
+        private bool isKeepFolderStructure = true;
         /// <summary>
         ///     Contains user preference to retain folder structure for images
         /// </summary>
@@ -111,7 +171,10 @@ namespace ExportSampleImages
         }
         
         private string notificationMessage;
-        private SemaphoreSlim semaphore;
+        private Dispatcher dispatcher;
+        private Queue<string> graphQueue;
+        private bool exportGraphWithGeometryBackgorund;
+        private bool export = true;
 
         /// <summary>
         ///     Contains notification text displayed on the UI
@@ -152,27 +215,36 @@ namespace ExportSampleImages
 
             p.CurrentWorkspaceChanged += OnCurrentWorkspaceChanged;
             p.CurrentWorkspaceCleared += OnCurrentWorkspaceCleared;
-            
+
             if (viewLoadedParamsInstance.CurrentWorkspaceModel is HomeWorkspaceModel)
             {
                 CurrentWorkspace = viewLoadedParamsInstance.CurrentWorkspaceModel as HomeWorkspaceModel;
                 DynamoViewModel = viewLoadedParamsInstance.DynamoWindow.DataContext as DynamoViewModel;
                 Helix3DViewModel = DynamoViewModel.BackgroundPreviewViewModel as HelixWatch3DViewModel;
+                dispatcher = viewLoadedParamsInstance.DynamoWindow.Dispatcher;
+                scheduler = DynamoViewModel.Model.Scheduler;
             }
 
-            semaphore = new SemaphoreSlim(0, 1);
+            //if(DisablePrompts) DynamoViewModel.Model.DisablePrompts = true;
 
             TargetPathViewModel = new PathViewModel
-                {Type = PathType.Target, Owner = viewLoadedParamsInstance.DynamoWindow};
+            { Type = PathType.Target, Owner = viewLoadedParamsInstance.DynamoWindow };
             SourcePathViewModel = new PathViewModel
-                {Type = PathType.Source, Owner = viewLoadedParamsInstance.DynamoWindow};
+            { Type = PathType.Source, Owner = viewLoadedParamsInstance.DynamoWindow };
+
+            dispatcher.Hooks.DispatcherInactive += OnDispatcherFinished;
 
             TargetPathViewModel.PropertyChanged += SourcePathPropertyChanged;
             SourcePathViewModel.PropertyChanged += SourcePathPropertyChanged;
 
             ExportGraphsCommand = new DelegateCommand(ExportGraphs);
             CancelCommand = new DelegateCommand(Cancel);
+
+            graphQueue = new Queue<string>();
+
+            sb = new StringBuilder();
         }
+
 
 
         // Handles source path changed
@@ -186,6 +258,10 @@ namespace ExportSampleImages
                 {
                     SourceFolderChanged(pathVM);
                 }
+                else
+                {
+                    TargetFolderChanged();
+                }
 
                 RaisePropertyChanged(nameof(CanExport));
             }
@@ -195,7 +271,7 @@ namespace ExportSampleImages
         private void SourceFolderChanged(PathViewModel pathVM)
         {
             Graphs = new ObservableCollection<GraphViewModel>();
-            graphDictionary = new Dictionary<string, GraphViewModel>();
+            graphDictionary = new Dictionary<int, GraphViewModel>();
 
             var files = Utilities.GetAllFilesOfExtension(pathVM.FolderPath)?.OrderBy(x => x);
             if (files == null)
@@ -204,19 +280,39 @@ namespace ExportSampleImages
             foreach (var graph in files)
             {
                 var name = Path.GetFileNameWithoutExtension(graph);
-                var graphVM = new GraphViewModel {GraphName = name};
+                var uniqueName = Path.GetFullPath(graph);
+                var graphVM = new GraphViewModel {GraphName = name, UniqueName = uniqueName };
 
                 Graphs.Add(graphVM);
-                graphDictionary[name] = graphVM;
+                graphDictionary[uniqueName.GetHashCode()] = graphVM;
+            }
+            
+            NotificationMessage = String.Format(Properties.Resources.NotificationMsg, Graphs.Count.ToString());
+            RaisePropertyChanged(nameof(Graphs));
+        }
+
+        private void TargetFolderChanged()
+        {
+            var log = GetLogFileInformation();
+
+            // Do not enqueue the file if it is already in the log file
+            if (resume && log != null)
+            {
+                Graphs.RemoveAll(x => log.Contains(x.UniqueName));
+                graphDictionary = Graphs.ToDictionary(x => x.UniqueName.GetHashCode(), x => x);
             }
 
             NotificationMessage = String.Format(Properties.Resources.NotificationMsg, Graphs.Count.ToString());
             RaisePropertyChanged(nameof(Graphs));
+
         }
 
         private void OnCurrentWorkspaceCleared(IWorkspaceModel workspace)
         {
             CurrentWorkspace = viewLoadedParamsInstance.CurrentWorkspaceModel as HomeWorkspaceModel;
+            if (CurrentWorkspace == null) return;
+
+            //CurrentWorkspace.RunSettings.RunType = RunType.Automatic;
         }
 
         private void OnCurrentWorkspaceChanged(IWorkspaceModel workspace)
@@ -224,12 +320,12 @@ namespace ExportSampleImages
             CurrentWorkspace = workspace as HomeWorkspaceModel;
             if (CurrentWorkspace == null) return;
 
+            //CurrentWorkspace.RunSettings.RunType = RunType.Automatic;
             CurrentWorkspace.EvaluationCompleted += CurrentWorkspaceOnEvaluationCompleted;
         }
 
         private void CurrentWorkspaceOnEvaluationCompleted(object sender, EvaluationCompletedEventArgs e)
         {
-            semaphore.Release();
             CurrentWorkspace.EvaluationCompleted -= CurrentWorkspaceOnEvaluationCompleted;
         }
 
@@ -246,103 +342,157 @@ namespace ExportSampleImages
             if (string.IsNullOrEmpty(SourcePathViewModel.FolderPath) ||
                 string.IsNullOrEmpty(TargetPathViewModel.FolderPath))
                 return;
-
-            var files = Utilities.GetAllFilesOfExtension(SourcePathViewModel.FolderPath)?.OrderBy(x => x);
-            if (files == null)
-                return;
             
             ResetUi();
 
-            int progress = 0;
-
-            foreach (var (file, index) in files.Select((file, index) => (file, index)))
+            foreach (var file in Graphs.ToList().Select(x => x.UniqueName).ToList())
             {
-                if (cancel) break;
-
-                NotificationMessage = String.Format(Properties.Resources.ProcessMsg, (index+1).ToString(), files.Count().ToString());
-                progress = index+1;
-
-                semaphore = new SemaphoreSlim(0, 1);
-
-                // 1 Open a graph
-                // If the graph is set on Automatic, it will run and set the 
-                // HasRunWithoutCrash flag to true. 
-                // If teh graph is set on Manual, the flag will be false
-                OpenDynamoGraph(file);
-
-                if (CurrentWorkspace.RunSettings.RunType == RunType.Manual || !CurrentWorkspace.HasRunWithoutCrash)
-                {
-                    // 2 Run 
-                    CurrentWorkspace.Run();
-                    DoEvents();
-
-                    semaphore.Wait(0);
-                    DoEvents(); // 
-                }
-                else
-                {
-                    DoEvents(); // Allows visual tree to be reconstructed.
-                }
-
-                // New method introduced in Helix3DViewModel
-                if (Helix3DViewModel.HasRenderedGeometry)
-                {
-                    ExportGraphAndBackground();
-                }
-                else
-                {
-                    ExportGraphOnly();
-                }
-
-                // 6 Update the UI
-                graphDictionary[Path.GetFileNameWithoutExtension(CurrentWorkspace.FileName)].Exported = true;
-                RaisePropertyChanged(nameof(Graphs));
+                graphQueue.Enqueue(file);
             }
-            
-            InformFinish(progress.ToString());
         }
+
+        private string [] GetLogFileInformation()
+        {
+            var filePath = TargetPathViewModel.FolderPath + "\\log.txt";
+            if (File.Exists(filePath))
+            {
+                return File.ReadAllLines(filePath);
+            }
+
+            return null;
+        }
+
+        private void OnDispatcherFinished(object sender, EventArgs e)
+        {
+            if (locked || graphQueue.Count > 0)
+            {
+                if (scheduler.HasPendingTasks) return;
+
+                switch (phase)
+                {
+                    case (RunPhase.Render):
+                        locked = true;
+                        RenderGraph(graphQueue.Dequeue());
+                        break;
+                    case (RunPhase.Export):
+                        ExportGraph();
+                        break;
+                    case (RunPhase.Save):
+                        locked = false;
+                        SaveGraph();
+                        Iterate();
+                        break;
+                }
+            }
+
+            if (graphQueue.Count == 0 && !finished && !locked)
+            {
+                finished = true;
+                InformFinish((progress).ToString());
+            }
+        }
+
+        private void Iterate()
+        {
+            // 6 Update the UI
+            NotificationMessage = String.Format(Properties.Resources.ProcessMsg, (progress + 1).ToString(), graphDictionary.Count.ToString());
+            graphDictionary[Path.GetFullPath(CurrentWorkspace.FileName).GetHashCode()].Exported = true;
+
+            EnterLog(CurrentWorkspace.FileName);
+
+            progress++;
+        }
+
+        private void EnterLog(string entry)
+        {
+            sb.Append(entry);
+            sb.Append(Environment.NewLine);
+            
+            File.AppendAllText(TargetPathViewModel.FolderPath + "\\log.txt", sb.ToString());
+            sb.Clear();
+        }
+
+        private void RenderGraph(string file)
+        {
+            phase = RunPhase.Export;
+            
+            OpenDynamoGraph(file);
+            
+            if (CurrentWorkspace.RunSettings.RunType == RunType.Manual || !CurrentWorkspace.HasRunWithoutCrash)
+            {
+                // 2 Run 
+                CurrentWorkspace.Run();
+            }
+        }
+
+        private void ExportGraph()
+        {
+            phase = RunPhase.Save;
+
+            // New method introduced in Helix3DViewModel
+            if (Helix3DViewModel.HasRenderedGeometry)
+            {
+                ExportGraphAndBackground();
+            }
+            else
+            {
+                ExportGraphOnly();
+            }
+        }
+
+        private void SaveGraph()
+        {
+            phase = RunPhase.Render;
+
+            if (exportGraphWithGeometryBackgorund)
+            {
+                // 5 Save a combined image
+                var graphName = GetImagePath(CurrentWorkspace.FileName);
+                ExportCombinedImages(graphName);
+
+            }
+            else
+            {
+                // 5 Save a graph-only image
+                var graphName = GetImagePath(CurrentWorkspace.FileName);
+                ExportGraphOnlyImages(graphName);
+            }
+        }
+
 
         private void ExportGraphAndBackground()
         {
+            exportGraphWithGeometryBackgorund = true;
+
             DynamoViewModel.BackgroundPreviewViewModel.ZoomToFitCommand.Execute(null);
-            DoEvents();
 
             if (isZoomedOut)
             {
                 DynamoViewModel.BackgroundPreviewViewModel.CanNavigateBackground = true;
-                DoEvents();
-
                 DynamoViewModel.ZoomOutCommand.Execute(null);
-                DoEvents();
-
                 DynamoViewModel.BackgroundPreviewViewModel.CanNavigateBackground = false;
-                DoEvents();
             }
 
             // 4 Auto Layout Nodes
             DynamoViewModel.GraphAutoLayoutCommand.Execute(null);
-            DoEvents();
-
-            // 5 Save an image
-            var graphName = GetImagePath(CurrentWorkspace.FileName);
-            ExportCombinedImages(graphName);
         }
 
         private void ExportGraphOnly()
         {
+            exportGraphWithGeometryBackgorund = false;
+
             // 4 Auto Layout Nodes
             DynamoViewModel.GraphAutoLayoutCommand.Execute(null);
-            DoEvents();
-
-            // 5 Save an image
-            var graphName = GetImagePath(CurrentWorkspace.FileName);
-            ExportGraphOnlyImages(graphName);
         }
+
 
         private void ResetUi()
         {
-            cancel = false;
+            progress = 0;
             graphDictionary.Values.ToList().ForEach(x => x.Exported = false);
+            finished = false;
+
+            File.Delete(TargetPathViewModel.FolderPath + "\\log.txt");
         }
 
 
@@ -371,6 +521,8 @@ namespace ExportSampleImages
             var successMessage = String.Format(Properties.Resources.FinishMsg, count);
             var owner = Window.GetWindow(viewLoadedParamsInstance.DynamoWindow);
 
+            EnterLog(successMessage);
+
             MessageBoxService.Show(owner, successMessage, Properties.Resources.FinishMsgTitle, MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
@@ -389,7 +541,6 @@ namespace ExportSampleImages
                 return;
             }
             Utilities.SaveBitmapToJpg(finalImage, TargetPathViewModel.FolderPath, graphName);
-
 
             CleanUp(pathForeground);
         }
@@ -438,7 +589,14 @@ namespace ExportSampleImages
 
         private void Cancel(object obj)
         {
-            cancel = true;
+            graphQueue.Clear();
+            Reset();
+        }
+
+        private void Reset()
+        {
+            phase = RunPhase.Render;
+            locked = false;
         }
 
         #endregion
@@ -452,6 +610,13 @@ namespace ExportSampleImages
         {
             TargetPathViewModel.PropertyChanged -= SourcePathPropertyChanged;
             SourcePathViewModel.PropertyChanged -= SourcePathPropertyChanged;
+            dispatcher.Hooks.DispatcherInactive -= OnDispatcherFinished;
+
+            CurrentWorkspace = null;
+            DynamoViewModel = null;
+            Helix3DViewModel = null;
+            dispatcher = null;
+            scheduler = null;
         }
 
         #endregion
@@ -479,6 +644,26 @@ namespace ExportSampleImages
         {
             ((DispatcherFrame) frame).Continue = false;
             return null;
+        }
+
+        /// <summary>
+        /// Removes all items matching condition
+        /// Source: https://stackoverflow.com/questions/5118513/removeall-for-observablecollections
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="coll"></param>
+        /// <param name="condition"></param>
+        /// <returns></returns>
+        private static int RemoveAll<T>(ObservableCollection<T> coll, Func<T, bool> condition)
+        {
+            var itemsToRemove = coll.Where(condition).ToList();
+
+            foreach (var itemToRemove in itemsToRemove)
+            {
+                coll.Remove(itemToRemove);
+            }
+
+            return itemsToRemove.Count;
         }
 
         #endregion

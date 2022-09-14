@@ -50,29 +50,55 @@
 
         <!-- Export button -->
         <StackPanel Orientation="Vertical" Grid.Row="1">
-            <StackPanel>
-                <CheckBox VerticalContentAlignment="Center"
-                          IsChecked="{Binding IsZoomedOut}" 
-                          Margin="5 0">
-                    <Label Content="{x:Static p:Resources.ZoomGeometryCheckboxMsg}"
-                           VerticalAlignment="Center"
-                           VerticalContentAlignment="Center"
-                           Margin="3 3 0 0"  
-                           Foreground="{StaticResource PreferencesWindowFontColor}"
-                           FontSize="11" />
-                </CheckBox>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <CheckBox VerticalContentAlignment="Center"
+                              IsChecked="{Binding IsZoomedOut}" 
+                              Margin="5 0">
+                        <Label VerticalContentAlignment="Center">
+                            <TextBlock Text="{x:Static p:Resources.ZoomGeometryCheckboxMsg}"
+                                       VerticalAlignment="Center"
+                                       Margin="3 3 0 0"  
+                                       TextWrapping="WrapWithOverflow"
+                                       Foreground="{StaticResource PreferencesWindowFontColor}"
+                                       FontSize="10" />
+                        </Label>
+                    </CheckBox>
 
-                <CheckBox VerticalContentAlignment="Center"
-                          IsChecked="{Binding IsKeepFolderStructure}" 
-                          Margin="5 0">
-                    <Label Content="{x:Static p:Resources.KeepFolderStructureCheckboxMsg}"
-                           VerticalAlignment="Center"
-                           VerticalContentAlignment="Center"
-                           Margin="3 3 0 0"  
-                           Foreground="{StaticResource PreferencesWindowFontColor}"
-                           FontSize="11" />
-                </CheckBox>
-            </StackPanel>
+                    <CheckBox VerticalContentAlignment="Center"
+                              IsChecked="{Binding IsKeepFolderStructure}" 
+                              Margin="5 0">
+                        <Label VerticalContentAlignment="Center">
+                            <TextBlock Text="{x:Static p:Resources.KeepFolderStructureCheckboxMsg}"
+                                       VerticalAlignment="Center"
+                                       Margin="3 3 0 0"  
+                                       TextWrapping="WrapWithOverflow"
+                                       Foreground="{StaticResource PreferencesWindowFontColor}"
+                                       FontSize="10" />
+                        </Label>
+                    </CheckBox>
+                </StackPanel>
+                <StackPanel Grid.Column="1">
+
+                    <CheckBox VerticalContentAlignment="Center"
+                              IsChecked="{Binding Resume}" 
+                              Margin="5 0">
+                        <Label VerticalContentAlignment="Center">
+                            <TextBlock Text="{x:Static p:Resources.ResumeCheckboxMsg}"
+                                       VerticalAlignment="Center"
+                                       TextWrapping="WrapWithOverflow"
+                                       Margin="3 3 0 0"  
+                                       Foreground="{StaticResource PreferencesWindowFontColor}"
+                                       FontSize="10" />
+                        </Label>
+                    </CheckBox>
+                </StackPanel>
+            </Grid>
+
             <Grid HorizontalAlignment="Stretch" Grid.Row="1" Margin="0 10 0 20" >
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"></ColumnDefinition>
@@ -82,6 +108,7 @@
                            Text="{Binding NotificationMessage}"
                            Padding="5 5 0 0"
                            VerticalAlignment="Center" 
+                           HorizontalAlignment="Left"
                            MaxWidth="250"
                            TextWrapping="WrapWithOverflow"
                            TextTrimming="CharacterEllipsis"

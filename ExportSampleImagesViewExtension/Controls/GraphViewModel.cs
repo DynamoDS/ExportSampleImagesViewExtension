@@ -38,5 +38,7 @@ namespace ExportSampleImages.Controls
                 }
             }
         }
+
+        public string UniqueName { get; set; }
     }
 }

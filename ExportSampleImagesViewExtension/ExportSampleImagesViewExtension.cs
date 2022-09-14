@@ -83,6 +83,8 @@ namespace ExportSampleImages
 
         private void MenuItemUnCheckHandler(object sender, RoutedEventArgs e)
         {
+            this.Dispose();
+
             viewLoadedParamsReference.CloseExtensioninInSideBar(this);
         }
 
