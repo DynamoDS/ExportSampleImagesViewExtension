@@ -10,9 +10,8 @@ The extension supports multiple graphs and sports a basic, although informative 
 #### Exporting Images
 ![demo_2](https://user-images.githubusercontent.com/5354594/186436384-f2060822-0394-4a91-aacf-21132fbf2d24.gif)
 
-### Single Graph Export
+#### Single Graph Export
 ![demo_3](https://user-images.githubusercontent.com/5354594/190723455-f6b43519-a05f-4c69-ad50-c473f12f1405.gif)
-
 
 ## Building
 
