@@ -37,11 +37,9 @@ namespace ExportSampleImages.Controls
             get => folderPath;
             set
             {
-                if (value != folderPath)
-                {
-                    folderPath = value;
-                    RaisePropertyChanged(nameof(FolderPath));
-                }
+                folderPath = value;
+                RaisePropertyChanged(nameof(FolderPath));
+                
             }
         }
 

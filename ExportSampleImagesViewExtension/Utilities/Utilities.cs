@@ -33,12 +33,11 @@ namespace ExportSampleImages
         /// <summary>
         /// Returns true if both paths exist
         /// </summary>
-        /// <param name="path1"></param>
-        /// <param name="path2"></param>
+        /// <param name="path"></param>
         /// <returns></returns>
-        public static bool AreValidPaths(string path1, string path2)
+        public static bool IsValidPath(string path)
         {
-            return Directory.Exists(path1) && Directory.Exists(path2);
+            return Directory.Exists(path);
         }
 
 
@@ -119,7 +118,7 @@ namespace ExportSampleImages
                         var graphics = Graphics.FromImage(finalImage);
 
                         graphics.CompositingMode = CompositingMode.SourceOver;
-                        graphics.Clear(Color.White); // Set a white background
+                        graphics.Clear(Color.FromArgb(249, 249, 249)); // Set a Dynamo-white background
                         graphics.DrawImage(resizedImage, 0,
                             resizedImage.Height * (float) 0.15); // Move the 3D Background a bit down
                         graphics.DrawImage(overlayImage,

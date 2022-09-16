@@ -134,16 +134,22 @@
     <value>Export Sample Images</value>
   </data>
   <data name="FinishMsg" xml:space="preserve">
-    <value>Successfully exported {0} images!</value>
+    <value>Successfully exported {0} images.</value>
   </data>
   <data name="FinishMsgTitle" xml:space="preserve">
     <value>Export finished.</value>
+  </data>
+  <data name="FinishSingleMsg" xml:space="preserve">
+    <value>Successfully exported {0} image.</value>
   </data>
   <data name="HeaderText" xml:space="preserve">
     <value>Show Export Sample Images</value>
   </data>
   <data name="KeepFolderStructureCheckboxMsg" xml:space="preserve">
     <value>Keep folder structure.</value>
+  </data>
+  <data name="KeepFolderStructureTooltip" xml:space="preserve">
+    <value>Retains the original folder/subfolder structure for graphs location.</value>
   </data>
   <data name="NotificationMsg" xml:space="preserve">
     <value>The target folder contains {0} Dynamo graphs.</value>
@@ -157,8 +163,17 @@
   <data name="ResumeCheckboxMsg" xml:space="preserve">
     <value>Resume previous session.</value>
   </data>
+  <data name="ResumeTooltip" xml:space="preserve">
+    <value>Attempts to resume the progress from a previous run. The progress is stored within the 'log.txt' file in the root Target folder.</value>
+  </data>
   <data name="SelectFolderMsg" xml:space="preserve">
     <value>Select folder ..</value>
+  </data>
+  <data name="SingleExportCheckboxMsg" xml:space="preserve">
+    <value>Export current graph.</value>
+  </data>
+  <data name="SingleExportTooltip" xml:space="preserve">
+    <value>Allows the export of a combined foreground/background image using the engine of this tool. The image will be saved in the Target folder.</value>
   </data>
   <data name="SourceFolderMsg" xml:space="preserve">
     <value>Source folder</value>
@@ -170,6 +185,9 @@
     <value>Select folder.</value>
   </data>
   <data name="ZoomGeometryCheckboxMsg" xml:space="preserve">
-    <value>Zoom out geometry background preview.</value>
+    <value>Zoom out.</value>
+  </data>
+  <data name="ZoomGeometryTooltip" xml:space="preserve">
+    <value>Automatically performs a single zoom out in the geometry background workspace.</value>
   </data>
 </root>

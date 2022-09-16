@@ -107,7 +107,7 @@ namespace ExportSampleImages.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Successfully exported {0} images!.
+        ///   Looks up a localized string similar to Successfully exported {0} images.
         /// </summary>
         public static string FinishMsg {
             get {
@@ -121,6 +121,15 @@ namespace ExportSampleImages.Properties {
         public static string FinishMsgTitle {
             get {
                 return ResourceManager.GetString("FinishMsgTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully exported {0} image..
+        /// </summary>
+        public static string FinishSingleMsg {
+            get {
+                return ResourceManager.GetString("FinishSingleMsg", resourceCulture);
             }
         }
         
@@ -139,6 +148,15 @@ namespace ExportSampleImages.Properties {
         public static string KeepFolderStructureCheckboxMsg {
             get {
                 return ResourceManager.GetString("KeepFolderStructureCheckboxMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Retains the original folder/subfolder structure for graphs location..
+        /// </summary>
+        public static string KeepFolderStructureTooltip {
+            get {
+                return ResourceManager.GetString("KeepFolderStructureTooltip", resourceCulture);
             }
         }
         
@@ -180,11 +198,38 @@ namespace ExportSampleImages.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Attempts to resume the progress from a previous run. The progress is stored within the &apos;log.txt&apos; file in the root Target folder..
+        /// </summary>
+        public static string ResumeTooltip {
+            get {
+                return ResourceManager.GetString("ResumeTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Select folder ...
         /// </summary>
         public static string SelectFolderMsg {
             get {
                 return ResourceManager.GetString("SelectFolderMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export current graph..
+        /// </summary>
+        public static string SingleExportCheckboxMsg {
+            get {
+                return ResourceManager.GetString("SingleExportCheckboxMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Allows the export of a combined foreground/background image using the engine of this tool. The image will be saved in the Target folder..
+        /// </summary>
+        public static string SingleExportTooltip {
+            get {
+                return ResourceManager.GetString("SingleExportTooltip", resourceCulture);
             }
         }
         
@@ -216,11 +261,20 @@ namespace ExportSampleImages.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Zoom out geometry background preview..
+        ///   Looks up a localized string similar to Zoom out..
         /// </summary>
         public static string ZoomGeometryCheckboxMsg {
             get {
                 return ResourceManager.GetString("ZoomGeometryCheckboxMsg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Automatically performs a single zoom out in the geometry background workspace..
+        /// </summary>
+        public static string ZoomGeometryTooltip {
+            get {
+                return ResourceManager.GetString("ZoomGeometryTooltip", resourceCulture);
             }
         }
     }

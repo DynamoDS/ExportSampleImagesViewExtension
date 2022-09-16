@@ -56,18 +56,6 @@
                     <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
-                    <CheckBox VerticalContentAlignment="Center"
-                              IsChecked="{Binding IsZoomedOut}" 
-                              Margin="5 0">
-                        <Label VerticalContentAlignment="Center">
-                            <TextBlock Text="{x:Static p:Resources.ZoomGeometryCheckboxMsg}"
-                                       VerticalAlignment="Center"
-                                       Margin="3 3 0 0"  
-                                       TextWrapping="WrapWithOverflow"
-                                       Foreground="{StaticResource PreferencesWindowFontColor}"
-                                       FontSize="10" />
-                        </Label>
-                    </CheckBox>
 
                     <CheckBox VerticalContentAlignment="Center"
                               IsChecked="{Binding IsKeepFolderStructure}" 
@@ -79,8 +67,29 @@
                                        TextWrapping="WrapWithOverflow"
                                        Foreground="{StaticResource PreferencesWindowFontColor}"
                                        FontSize="10" />
+                            <Label.ToolTip>
+                                <ToolTip Content="{x:Static p:Resources.KeepFolderStructureTooltip}" 
+                                         Style="{StaticResource GenericToolTipLight}"/>
+                            </Label.ToolTip>
                         </Label>
                     </CheckBox>
+                    <CheckBox VerticalContentAlignment="Center"
+                              IsChecked="{Binding IsZoomedOut}" 
+                              Margin="5 0">
+                        <Label VerticalContentAlignment="Center">
+                            <TextBlock Text="{x:Static p:Resources.ZoomGeometryCheckboxMsg}"
+                                       VerticalAlignment="Center"
+                                       Margin="3 3 0 0"  
+                                       TextWrapping="WrapWithOverflow"
+                                       Foreground="{StaticResource PreferencesWindowFontColor}"
+                                       FontSize="10" />
+                            <Label.ToolTip>
+                                <ToolTip Content="{x:Static p:Resources.ZoomGeometryTooltip}" 
+                                         Style="{StaticResource GenericToolTipLight}"/>
+                            </Label.ToolTip>
+                        </Label>
+                    </CheckBox>
+
                 </StackPanel>
                 <StackPanel Grid.Column="1">
 
@@ -94,6 +103,27 @@
                                        Margin="3 3 0 0"  
                                        Foreground="{StaticResource PreferencesWindowFontColor}"
                                        FontSize="10" />
+                            <Label.ToolTip>
+                                <ToolTip Content="{x:Static p:Resources.ResumeTooltip}" 
+                                         Style="{StaticResource GenericToolTipLight}"/>
+                            </Label.ToolTip>
+                        </Label>
+                    </CheckBox>
+
+                    <CheckBox VerticalContentAlignment="Center"
+                              IsChecked="{Binding SingleGraph}" 
+                              Margin="5 0">
+                        <Label VerticalContentAlignment="Center">
+                            <TextBlock Text="{x:Static p:Resources.SingleExportCheckboxMsg}"
+                                       VerticalAlignment="Center"
+                                       TextWrapping="WrapWithOverflow"
+                                       Margin="3 3 0 0"  
+                                       Foreground="{StaticResource PreferencesWindowFontColor}"
+                                       FontSize="10" />
+                            <Label.ToolTip>
+                                <ToolTip Content="{x:Static p:Resources.SingleExportTooltip}" 
+                                         Style="{StaticResource GenericToolTipLight}"/>
+                            </Label.ToolTip>
                         </Label>
                     </CheckBox>
                 </StackPanel>

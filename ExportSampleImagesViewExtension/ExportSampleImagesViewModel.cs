@@ -74,9 +74,15 @@ namespace ExportSampleImages
         {
             get
             {
-                if (SourcePathViewModel == null || TargetPathViewModel == null)
+                if (TargetPathViewModel?.FolderPath == null)
                     return false;
-                return Utilities.AreValidPaths(SourcePathViewModel.FolderPath, TargetPathViewModel.FolderPath);
+                if (SourcePathViewModel?.FolderPath == null && !SingleGraph)
+                    return false;
+                if (SourcePathViewModel?.FolderPath == null && SingleGraph)
+                    return Utilities.IsValidPath(TargetPathViewModel.FolderPath);
+                if(SourcePathViewModel?.FolderPath != null)
+                    return Utilities.IsValidPath(TargetPathViewModel.FolderPath) && Utilities.IsValidPath(SourcePathViewModel.FolderPath);
+                return false;
             }
             private set
             {
@@ -129,26 +135,27 @@ namespace ExportSampleImages
             }
         }
 
-        //private bool disablePrompts = true;
-        ///// <summary>
-        /////     Indicates if Dynamo should suppress Warning dialogs
-        /////     If not set, the run will be interrupted when prompt is shown
-        ///// </summary>
-        //public bool DisablePrompts
-        //{
-        //    get
-        //    {
-        //        return disablePrompts;
-        //    }
-        //    set
-        //    {
-        //        if (disablePrompts != value)
-        //        {
-        //            disablePrompts = value;
-        //            RaisePropertyChanged(nameof(DisablePrompts));
-        //        }
-        //    }
-        //}
+        private bool singleGraph = false;
+        /// <summary>
+        ///     This override allows users to export a single graph
+        ///     The current graph will be exported to the Target folder
+        /// </summary>
+        public bool SingleGraph
+        {
+            get
+            {
+                return singleGraph;
+            }
+            set
+            {
+                if (singleGraph != value)
+                {
+                    singleGraph = value;
+                    RaisePropertyChanged(nameof(SingleGraph));
+                    RaisePropertyChanged(nameof(CanExport));
+                }
+            }
+        }
 
         private bool isKeepFolderStructure = true;
         /// <summary>
@@ -173,7 +180,6 @@ namespace ExportSampleImages
         private string notificationMessage;
         private Dispatcher dispatcher;
         private Queue<string> graphQueue;
-        private bool exportGraphWithGeometryBackgorund;
         private bool export = true;
 
         /// <summary>
@@ -302,17 +308,16 @@ namespace ExportSampleImages
                 graphDictionary = Graphs.ToDictionary(x => x.UniqueName.GetHashCode(), x => x);
             }
 
+            if (Graphs == null) return;
+
             NotificationMessage = String.Format(Properties.Resources.NotificationMsg, Graphs.Count.ToString());
             RaisePropertyChanged(nameof(Graphs));
-
         }
 
         private void OnCurrentWorkspaceCleared(IWorkspaceModel workspace)
         {
             CurrentWorkspace = viewLoadedParamsInstance.CurrentWorkspaceModel as HomeWorkspaceModel;
             if (CurrentWorkspace == null) return;
-
-            //CurrentWorkspace.RunSettings.RunType = RunType.Automatic;
         }
 
         private void OnCurrentWorkspaceChanged(IWorkspaceModel workspace)
@@ -320,7 +325,6 @@ namespace ExportSampleImages
             CurrentWorkspace = workspace as HomeWorkspaceModel;
             if (CurrentWorkspace == null) return;
 
-            //CurrentWorkspace.RunSettings.RunType = RunType.Automatic;
             CurrentWorkspace.EvaluationCompleted += CurrentWorkspaceOnEvaluationCompleted;
         }
 
@@ -339,16 +343,29 @@ namespace ExportSampleImages
         /// <param name="obj"></param>
         private void ExportGraphs(object obj)
         {
-            if (string.IsNullOrEmpty(SourcePathViewModel.FolderPath) ||
-                string.IsNullOrEmpty(TargetPathViewModel.FolderPath))
+            if (string.IsNullOrEmpty(TargetPathViewModel.FolderPath) ||
+                string.IsNullOrEmpty(SourcePathViewModel.FolderPath) && !SingleGraph)
                 return;
-            
+
+            if (SingleGraph)
+            {
+                NotificationMessage = string.Empty;
+                ExportCurrentGraph();
+                return;
+            }
+
             ResetUi();
 
             foreach (var file in Graphs.ToList().Select(x => x.UniqueName).ToList())
             {
                 graphQueue.Enqueue(file);
             }
+        }
+
+        private void ExportCurrentGraph()
+        {
+            SaveGraph();
+            NotificationMessage = String.Format(Properties.Resources.FinishSingleMsg, CurrentWorkspace.Name);
         }
 
         private string [] GetLogFileInformation()
@@ -394,7 +411,6 @@ namespace ExportSampleImages
 
         private void Iterate()
         {
-            // 6 Update the UI
             NotificationMessage = String.Format(Properties.Resources.ProcessMsg, (progress + 1).ToString(), graphDictionary.Count.ToString());
             graphDictionary[Path.GetFullPath(CurrentWorkspace.FileName).GetHashCode()].Exported = true;
 
@@ -420,7 +436,6 @@ namespace ExportSampleImages
             
             if (CurrentWorkspace.RunSettings.RunType == RunType.Manual || !CurrentWorkspace.HasRunWithoutCrash)
             {
-                // 2 Run 
                 CurrentWorkspace.Run();
             }
         }
@@ -428,8 +443,7 @@ namespace ExportSampleImages
         private void ExportGraph()
         {
             phase = RunPhase.Save;
-
-            // New method introduced in Helix3DViewModel
+            
             if (Helix3DViewModel.HasRenderedGeometry)
             {
                 ExportGraphAndBackground();
@@ -444,16 +458,14 @@ namespace ExportSampleImages
         {
             phase = RunPhase.Render;
 
-            if (exportGraphWithGeometryBackgorund)
+            if (Helix3DViewModel.HasRenderedGeometry)
             {
-                // 5 Save a combined image
                 var graphName = GetImagePath(CurrentWorkspace.FileName);
                 ExportCombinedImages(graphName);
 
             }
             else
             {
-                // 5 Save a graph-only image
                 var graphName = GetImagePath(CurrentWorkspace.FileName);
                 ExportGraphOnlyImages(graphName);
             }
@@ -462,8 +474,6 @@ namespace ExportSampleImages
 
         private void ExportGraphAndBackground()
         {
-            exportGraphWithGeometryBackgorund = true;
-
             DynamoViewModel.BackgroundPreviewViewModel.ZoomToFitCommand.Execute(null);
 
             if (isZoomedOut)
@@ -472,16 +482,12 @@ namespace ExportSampleImages
                 DynamoViewModel.ZoomOutCommand.Execute(null);
                 DynamoViewModel.BackgroundPreviewViewModel.CanNavigateBackground = false;
             }
-
-            // 4 Auto Layout Nodes
+            
             DynamoViewModel.GraphAutoLayoutCommand.Execute(null);
         }
 
         private void ExportGraphOnly()
         {
-            exportGraphWithGeometryBackgorund = false;
-
-            // 4 Auto Layout Nodes
             DynamoViewModel.GraphAutoLayoutCommand.Execute(null);
         }
 
@@ -503,7 +509,7 @@ namespace ExportSampleImages
             if (directory == null) return null;
 
             var graphFolder = Path.GetFullPath(directory);
-            var newFolder = IsKeepFolderStructure ? 
+            var newFolder = IsKeepFolderStructure && !SingleGraph ?
                     TargetPathViewModel.FolderPath + graphFolder.Substring(SourcePathViewModel.FolderPath.Length) :
                     TargetPathViewModel.FolderPath;
 
