@@ -152,7 +152,7 @@
     <value>Retains the original folder/subfolder structure for graphs location.</value>
   </data>
   <data name="NotificationMsg" xml:space="preserve">
-    <value>The target folder contains {0} Dynamo graphs.</value>
+    <value>The source folder contains {0} Dynamo graphs.</value>
   </data>
   <data name="ProcessMsg" xml:space="preserve">
     <value>Processed {0} out of {1} graphs.</value>
