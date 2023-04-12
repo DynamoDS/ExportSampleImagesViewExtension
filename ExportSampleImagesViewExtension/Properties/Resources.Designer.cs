@@ -143,7 +143,7 @@ namespace ExportSampleImages.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Keep folder structure..
+        ///   Looks up a localized string similar to Keep folder structure.
         /// </summary>
         public static string KeepFolderStructureCheckboxMsg {
             get {
@@ -189,7 +189,7 @@ namespace ExportSampleImages.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Resume previous session..
+        ///   Looks up a localized string similar to Resume previous session.
         /// </summary>
         public static string ResumeCheckboxMsg {
             get {
@@ -216,7 +216,7 @@ namespace ExportSampleImages.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Export current graph..
+        ///   Looks up a localized string similar to Export current graph.
         /// </summary>
         public static string SingleExportCheckboxMsg {
             get {
@@ -225,7 +225,7 @@ namespace ExportSampleImages.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Allows the export of a combined foreground/background image using the engine of this tool. The image will be saved in the Target folder..
+        ///   Looks up a localized string similar to Exports an image of the current graph. Select a target folder and check this box to enable export..
         /// </summary>
         public static string SingleExportTooltip {
             get {
@@ -261,7 +261,7 @@ namespace ExportSampleImages.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Zoom out..
+        ///   Looks up a localized string similar to Zoom out.
         /// </summary>
         public static string ZoomGeometryCheckboxMsg {
             get {
