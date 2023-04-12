@@ -51,6 +51,21 @@ namespace ExportSampleImages
 
             // Add a button to Dynamo View menu to manually show the window
             exportSampleImagesMenuItem = new MenuItem {Header = Properties.Resources.HeaderText, IsCheckable = true};
+
+            exportSampleImagesMenuItem.Click += (sender, args) =>
+            {
+                if (exportSampleImagesMenuItem.IsChecked)
+                {
+                    AddToSidebar();
+                    exportSampleImagesMenuItem.IsChecked = true;
+                }
+                else
+                {
+                    viewLoadedParams.CloseExtensioninInSideBar(this);
+                    exportSampleImagesMenuItem.IsChecked = false;
+                }
+            };
+
             exportSampleImagesMenuItem.Checked += MenuItemCheckHandler;
             exportSampleImagesMenuItem.Unchecked += MenuItemUnCheckHandler;
 
